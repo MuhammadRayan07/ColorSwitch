@@ -66,9 +66,7 @@ int main()
         return -1;
     }
 
-    //------------------------------------
-    // Sprites
-    //------------------------------------
+   
     sf::Sprite logo(logoTex);
     sf::Sprite play(playTex);
     sf::Sprite star(starTex);
@@ -79,9 +77,7 @@ int main()
     sf::Sprite about(aboutTex);
     sf::Sprite Creator(Creators);
     sf::Sprite det(Details);
-    //------------------------------------
-    // Helper for centering origins
-    //------------------------------------
+
     auto centerOrigin = [](sf::Sprite& s)
         {
             auto size = s.getTexture().getSize();
@@ -101,16 +97,11 @@ int main()
     centerOrigin(about);
     centerOrigin(Creator);
     centerOrigin(det);
-    //------------------------------------
-    // Scaling
-    //------------------------------------
+    
 
     logo.setScale({ 0.70f,0.70f });
-
     play.setScale({ 0.70f,0.70f });
-
     star.setScale({ 0.40f,0.40f });
-
     plus.setScale({ 0.60f,0.60f });
     plus2.setScale({ 0.60f,0.60f });
     creators.setScale({ 0.40f,0.40f });
@@ -118,37 +109,25 @@ int main()
     about.setScale({ 0.40f,0.40f });
     Creator.setScale({ 0.80f,0.80f });
     det.setScale({ 0.85f,0.85f });
-    //------------------------------------
-    // Positioning
-    //------------------------------------
-
-    // top logo
-    logo.setPosition({
-        width / 2.f,
-        150.f
-        });
-    Creator.setPosition({
-        width / 2.f,
-        450.f
+   
+    logo.setPosition({width / 2.f,150.f});
+    Creator.setPosition({ width / 2.f, 450.f
         });
     det.setPosition({
         360.f,
         450.f
         });
-    // play button center
+    
     play.setPosition({
         width / 2.f,
         450.f
         });
 
-    // star just above play
     star.setPosition({
         width / 4.f,
         275.f
         });
 
-
-    // bottom menu buttons
     creators.setPosition({
         400.f,
         660.f
@@ -167,39 +146,30 @@ int main()
         {
             return s.getGlobalBounds().contains(mouse);
         };
-    //------------------------------------
-    // Animation Clock
-    //------------------------------------
+ 
     sf::Clock clock;
-    // ------------------------------------
-    // Animated side balls
-    // ------------------------------------
+
     sf::CircleShape leftBall(18.f);
     sf::CircleShape rightBall(18.f);
 
     leftBall.setOrigin({ 18.f,18.f });
     rightBall.setOrigin({ 18.f,18.f });
 
-    // Color Switch style colors
+
     leftBall.setFillColor(sf::Color(255, 0, 180));
     rightBall.setFillColor(sf::Color(0, 220, 255));
 
-    // positions beside play button
+
     float leftX = 180.f;
     float rightX = 630.f;
 
-    // start near bottom
     float leftY = 450.f;
     float rightY = 450.f;
 
-    // upward launch velocities
     float leftVelocity = -620.f;
     float rightVelocity = -620.f;
 
-    // gravity
     const float g = 800.f;
-
-    // bounce bounds
     const float topLimit = 30.f;
     const float bottomLimit = 540.f;
 
@@ -217,7 +187,6 @@ int main()
             {
                 if (key->scancode == sf::Keyboard::Scancode::Escape)
                 {
-                    // Escape returns to main menu
                     if (currentScreen != Screen::MainMenu)
                         currentScreen = Screen::MainMenu;
                     else
@@ -254,32 +223,25 @@ int main()
         }
         float dt = deltaClock.restart().asSeconds();
         float t = clock.getElapsedTime().asSeconds();
-
-        // rotate plus spinner
         plus.setRotation(
             sf::degrees(t * 80.f)
         );
         plus2.setRotation(
             sf::degrees(t * 80.f)
         );
-        // ------------------
-        // Gravity bouncing balls
-        // ------------------
         leftVelocity += g * dt;
         leftY += leftVelocity * dt;
 
-        // bounce near top
         if (leftY < topLimit)
         {
             leftY = topLimit;
             leftVelocity *= -1.f;
         }
 
-        // bounce off bottom
         if (leftY > bottomLimit)
         {
             leftY = bottomLimit;
-            leftVelocity = -620.f; // relaunch upward
+            leftVelocity = -620.f;
         }
 
 
@@ -300,7 +262,7 @@ int main()
 
         leftBall.setPosition({ leftX,leftY });
         rightBall.setPosition({ rightX,rightY });
-        // subtle floating star
+  
         star.setPosition({
             width / 2.f,
             275.f + sin(t * 2.f) * 10.f
@@ -310,20 +272,14 @@ int main()
 
         if (currentScreen == Screen::MainMenu)
         {
-            // main menu
+            
             window.draw(logo);
             window.draw(star);
             window.draw(leftBall);
             window.draw(rightBall);
             window.draw(play);
-            plus.setPosition({
-                650.f,
-                700.f
-                });
-            plus2.setPosition({
-               150.f,
-               700.f
-                });
+            plus.setPosition({650.f,700.f});
+            plus2.setPosition({150.f, 700.f});
             window.draw(plus);
             window.draw(plus2);
             window.draw(creators);
@@ -332,13 +288,9 @@ int main()
         }
         else
         {
-
-            // Example placeholders:
             if (currentScreen == Screen::PlayMenu)
             {
-                // level select
-                // game modes
-                // start button
+                
             }
 
             if (currentScreen == Screen::CreatorsMenu)
