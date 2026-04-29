@@ -4,7 +4,7 @@
 int main()
 {
     sf::RenderWindow window(
-        sf::VideoMode({ 800u, 900u }),
+        sf::VideoMode({ 800, 900 }),
         "Color Switch"
     );
     window.setFramerateLimit(60);
@@ -26,13 +26,11 @@ int main()
         if (menu.shouldClose())
             window.close();
 
-        // ---- Update ----
         float dt = dtClock.restart().asSeconds();
         float t = timeClock.getElapsedTime().asSeconds();
 
         menu.update(dt, t);
 
-        // ---- Draw ----
         window.clear(sf::Color(41, 41, 41));
         menu.draw(window);
         window.display();

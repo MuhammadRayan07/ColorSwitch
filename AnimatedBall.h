@@ -9,9 +9,9 @@ private:
     float x;
     float velocity;
 
-    static constexpr float g = 800.f;
-    static constexpr float topLimit = 30.f;
-    static constexpr float bottomLimit = 540.f;
+    const float g = 800.f;
+    const float topLimit = 30.f;
+    const float bottomLimit = 540.f;
 
 public:
     AnimatedBall();

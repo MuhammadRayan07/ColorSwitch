@@ -1,15 +1,6 @@
 #include "Menus.h"
 #include <iostream>
 #include <cmath>
-void Menu::setupSprite(sf::Sprite& s,
-    float scaleX, float scaleY,
-    float posX, float posY)
-{
-    auto size = s.getTexture().getSize();
-    s.setOrigin({ size.x / 2.f, size.y / 2.f });
-    s.setScale({ scaleX, scaleY });
-    s.setPosition({ posX, posY });
-}
 
 Menu::Menu()
     : leftBall(180.f, sf::Color(255, 0, 180))
@@ -17,6 +8,7 @@ Menu::Menu()
     , currentScreen(Screen::MainMenu)
     , wantsClose(false)
 {
+  
     if (!logoTex.loadFromFile("ColorSwitchSprites/Colorswitch.png") ||
         !playTex.loadFromFile("ColorSwitchSprites/Play.png") ||
         !starTex.loadFromFile("ColorSwitchSprites/Star.png") ||
@@ -29,32 +21,74 @@ Menu::Menu()
     {
         std::cout << "Failed loading textures\n";
     }
-    logo.emplace(logoTex);
-    play.emplace(playTex);
-    star.emplace(starTex);
-    plus.emplace(plusTex);
-    plus2.emplace(plusTex);
-    creators.emplace(creatorsTex);
-    high.emplace(highTex);
-    about.emplace(aboutTex);
-    creatorPage.emplace(creatorPageTex);
-    details.emplace(detailsTex);
+    logo = new sf::Sprite(logoTex);
+    play = new sf::Sprite(playTex);
+    star = new sf::Sprite(starTex);
+    plus = new sf::Sprite(plusTex);
+    plus2 = new sf::Sprite(plusTex);
+    creators = new sf::Sprite(creatorsTex);
+    high = new sf::Sprite(highTex);
+    about = new sf::Sprite(aboutTex);
+    creatorPage = new sf::Sprite(creatorPageTex);
+    details = new sf::Sprite(detailsTex);
 
-    setupSprite(*logo, 0.70f, 0.70f, 400.f, 150.f);
-    setupSprite(*play, 0.70f, 0.70f, 400.f, 450.f);
-    setupSprite(*star, 0.40f, 0.40f, 400.f, 275.f);
-    setupSprite(*plus, 0.60f, 0.60f, 650.f, 700.f);
-    setupSprite(*plus2, 0.60f, 0.60f, 150.f, 700.f); 
-    setupSprite(*creators, 0.40f, 0.40f, 400.f, 660.f);
-    setupSprite(*high, 0.40f, 0.40f, 405.f, 740.f);
-    setupSprite(*about, 0.40f, 0.40f, 400.f, 820.f);
-    setupSprite(*creatorPage, 0.80f, 0.80f, 400.f, 450.f);
-    setupSprite(*details, 0.85f, 0.85f, 360.f, 450.f);
+  
+    centerOrigin(logo);
+    centerOrigin(play);
+    centerOrigin(star);
+    centerOrigin(plus);
+    centerOrigin(plus2);
+    centerOrigin(creators);
+    centerOrigin(high);
+    centerOrigin(about);
+    centerOrigin(creatorPage);
+    centerOrigin(details);
+
+    
+    logo->setScale({ 0.70f, 0.70f });
+    play->setScale({ 0.70f, 0.70f });
+    star->setScale({ 0.40f, 0.40f });
+    plus->setScale({ 0.60f, 0.60f });
+    plus2->setScale({ 0.60f, 0.60f });
+    creators->setScale({ 0.40f, 0.40f });
+    high->setScale({ 0.40f, 0.40f });
+    about->setScale({ 0.40f, 0.40f });
+    creatorPage->setScale({ 0.80f, 0.80f });
+    details->setScale({ 0.85f, 0.85f });
+
+    logo->setPosition({ 400.f, 150.f });
+    play->setPosition({ 400.f, 450.f });
+    star->setPosition({ 400.f, 275.f });
+    creators->setPosition({ 400.f, 660.f });
+    high->setPosition({ 405.f, 740.f });
+    about->setPosition({ 400.f, 820.f });
+    creatorPage->setPosition({ 400.f, 450.f });
+    details->setPosition({ 360.f, 450.f });
 }
 
-bool Menu::clicked(const sf::Sprite& s, sf::Vector2f mouse) const
+Menu::~Menu()
 {
-    return s.getGlobalBounds().contains(mouse);
+    delete logo;
+    delete play;
+    delete star;
+    delete plus;
+    delete plus2;
+    delete creators;
+    delete high;
+    delete about;
+    delete creatorPage;
+    delete details;
+}
+
+void Menu::centerOrigin(sf::Sprite* s)
+{
+    auto size = s->getTexture().getSize();
+    s->setOrigin({ size.x / 2.f, size.y / 2.f });
+}
+
+bool Menu::clicked(sf::Sprite* s, sf::Vector2f mouse)
+{
+    return s->getGlobalBounds().contains(mouse);
 }
 
 void Menu::handleEvent(const sf::Event& event)
@@ -74,17 +108,17 @@ void Menu::handleEvent(const sf::Event& event)
     {
         if (mb->button == sf::Mouse::Button::Left)
         {
-            sf::Vector2f m(
-                static_cast<float>(mb->position.x),
-                static_cast<float>(mb->position.y)
+            sf::Vector2f mousePos(
+                (float)mb->position.x,
+                (float)mb->position.y
             );
 
             if (currentScreen == Screen::MainMenu)
             {
-                if (clicked(*play, m)) currentScreen = Screen::PlayMenu;
-                else if (clicked(*creators, m)) currentScreen = Screen::CreatorsMenu;
-                else if (clicked(*high, m)) currentScreen = Screen::HighscoreMenu;
-                else if (clicked(*about, m)) currentScreen = Screen::AboutMenu;
+                if (clicked(play, mousePos)) currentScreen = Screen::PlayMenu;
+                else if (clicked(creators, mousePos)) currentScreen = Screen::CreatorsMenu;
+                else if (clicked(high, mousePos)) currentScreen = Screen::HighscoreMenu;
+                else if (clicked(about, mousePos)) currentScreen = Screen::AboutMenu;
             }
         }
     }
@@ -94,10 +128,13 @@ void Menu::update(float dt, float t)
 {
     leftBall.update(dt);
     rightBall.update(dt);
-    star->setPosition({ 400.f, 275.f + std::sin(t * 2.f) * 10.f });
+
+    star->setPosition({ 400.f, 275.f + sin(t * 2.f) * 10.f });
+
     plus->setRotation(sf::degrees(t * 80.f));
     plus2->setRotation(sf::degrees(t * 80.f));
 }
+
 void Menu::draw(sf::RenderWindow& window)
 {
     if (currentScreen == Screen::MainMenu)
@@ -119,7 +156,7 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::PlayMenu)
     {
-       //Modes
+        //  level select
     }
     else if (currentScreen == Screen::CreatorsMenu)
     {
@@ -135,7 +172,7 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::HighscoreMenu)
     {
-  
+        // score table
     }
     else if (currentScreen == Screen::AboutMenu)
     {

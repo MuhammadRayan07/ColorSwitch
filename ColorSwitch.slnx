@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="ColorSwitch.vcxproj" />
+  <Project Path="ColorSwitch.vcxproj" Id="21f91ac6-c8c8-490d-948c-cff4d8b92e07" />
 </Solution>
