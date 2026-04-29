@@ -66,7 +66,6 @@ int main()
         return -1;
     }
 
-   
     sf::Sprite logo(logoTex);
     sf::Sprite play(playTex);
     sf::Sprite star(starTex);
@@ -81,10 +80,7 @@ int main()
     auto centerOrigin = [](sf::Sprite& s)
         {
             auto size = s.getTexture().getSize();
-            s.setOrigin({
-                size.x / 2.f,
-                size.y / 2.f
-                });
+            s.setOrigin({ size.x / 2.f,size.y / 2.f });
         };
 
     centerOrigin(logo);
@@ -98,7 +94,6 @@ int main()
     centerOrigin(Creator);
     centerOrigin(det);
     
-
     logo.setScale({ 0.70f,0.70f });
     play.setScale({ 0.70f,0.70f });
     star.setScale({ 0.40f,0.40f });
@@ -111,32 +106,12 @@ int main()
     det.setScale({ 0.85f,0.85f });
    
     logo.setPosition({width / 2.f,150.f});
-    Creator.setPosition({ width / 2.f, 450.f
-        });
-    det.setPosition({
-        360.f,
-        450.f
-        });
-    
-    play.setPosition({
-        width / 2.f,
-        450.f
-        });
-
-    star.setPosition({
-        width / 4.f,
-        275.f
-        });
-
-    creators.setPosition({
-        400.f,
-        660.f
-        });
-
-    high.setPosition({
-        405.f,
-        740.f
-        });
+    Creator.setPosition({ width / 2.f, 450.f});
+    det.setPosition({360.f,450.f });
+    play.setPosition({ width / 2.f, 450.f});
+    star.setPosition({width / 4.f, 275.f});
+    creators.setPosition({ 400.f,660.f });
+    high.setPosition({ 405.f,740.f});
 
     about.setPosition({
         400.f,
@@ -272,7 +247,6 @@ int main()
 
         if (currentScreen == Screen::MainMenu)
         {
-            
             window.draw(logo);
             window.draw(star);
             window.draw(leftBall);
