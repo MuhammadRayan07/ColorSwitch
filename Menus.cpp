@@ -112,11 +112,8 @@ int main()
     star.setPosition({width / 4.f, 275.f});
     creators.setPosition({ 400.f,660.f });
     high.setPosition({ 405.f,740.f});
+    about.setPosition({400.f,820.f});
 
-    about.setPosition({
-        400.f,
-        820.f
-        });
     auto clickedSprite = [&](const sf::Sprite& s, sf::Vector2f mouse)
         {
             return s.getGlobalBounds().contains(mouse);
