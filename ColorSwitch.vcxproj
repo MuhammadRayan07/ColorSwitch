@@ -130,7 +130,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnimatedBall.cpp" />
+    <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Menus.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AnimatedBall.h" />
+    <ClInclude Include="Assets.h" />
+    <ClInclude Include="Menus.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
