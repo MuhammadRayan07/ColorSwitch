@@ -105,13 +105,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\mraya\Desktop\SFML\SFML-3.0.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\mraya\Desktop\SFML\SFML-3.0.2\include;$(SolutionDir)\include;$(SolutionDir)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\mraya\Desktop\SFML\SFML-3.0.2\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-network-d.lib;sfml-audio-d.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\mraya\Desktop\SFML\SFML-3.0.2\lib;$(SolutionDir)\lib;$(SolutionDir)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;sfml-network-d.lib;sfml-audio-d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -123,10 +123,13 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>;$(SolutionDir)\include;$(SolutionDir)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>;$(SolutionDir)\lib;$(SolutionDir)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system.lib;sfml-window.lib;sfml-graphics.lib;sfml-network.lib;sfml-audio.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
