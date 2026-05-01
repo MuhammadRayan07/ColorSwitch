@@ -1,7 +1,9 @@
 #include "Menus.h"
 #include <iostream>
 #include <cmath>
-
+#include "Rotation.h"
+#include "Collision.h"
+bool spacePressed = false;
 Menu::Menu()
     : leftBall(180.f, sf::Color(255, 0, 180))
     , rightBall(630.f, sf::Color(0, 220, 255))
@@ -140,10 +142,15 @@ Menu::~Menu()
     delete ring2;
     delete highScoreMenu;
     delete bigRing;
+    delete bigRing2;
+    delete bigRing3;
+    delete bigRing4;
+    delete bigRing5;
     cleanupGame();
 }
 void Menu::startGame()
 {
+    score = 0;
     cleanupGame();
 
     const int width = 800;
@@ -156,7 +163,7 @@ void Menu::startGame()
     gravity = 0.5f;
     jumpStrength = -10.f;
 
-    gameBall = new Ball(20.f, centerX, groundY);
+    gameBall = new Ball(10.f, centerX, groundY);
     gameCamera = new Camera((float)width, (float)height);
     shapeCapacity = 10;
     shapeCount = 0;
@@ -217,8 +224,19 @@ void Menu::handleEvent(const sf::Event& event)
                 wantsClose = true;
         }
         if (key->scancode == sf::Keyboard::Scancode::Space)
-            if (currentScreen == Screen::GameScreen && gameBall)
-                gameBall->setVelocityY(jumpStrength);
+        {
+            if (!spacePressed)
+            {
+                spacePressed = true;
+                if (currentScreen == Screen::GameScreen && gameBall)
+                    gameBall->setVelocityY(jumpStrength);
+            }
+        }
+    }
+    if (auto* key = event.getIf<sf::Event::KeyReleased>())
+    {
+        if (key->scancode == sf::Keyboard::Scancode::Space)
+            spacePressed = false;
     }
 
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>())
@@ -274,12 +292,30 @@ void Menu::update(float dt, float t)
         moveBall(*gameBall);
         resetBallOnGround(*gameBall, 880.f);
         updateCamera(*gameCamera, *gameBall, width, height);
+        rotateAllShapes(shapes, shapeCount, 1.0f);
+
+        if (checkStarCollection(*gameBall, shapes, shapeCount))
+        {
+            score++;
+            std::cout << "Score: " << score << "\n";
+        }
+
+        checkShapePassCollision(*gameBall, shapes, shapeCount);
+
+        if (checkWrongColorCollision(*gameBall, shapes, shapeCount))
+            currentScreen = Screen::MainMenu;
 
         if (gameBall->getPosition().y < lastSpawnY + gap)
         {
             spawnShape(shapes, shapeCount, shapeCapacity,
                 width / 2.f, lastSpawnY, width);
             lastSpawnY -= gap;
+        }
+        while (shapeCount > 0 &&
+            shapes[0] != nullptr &&
+            shapes[0]->getY() > gameCamera->getCenter().y + 600.f)
+        {
+            removeFirst(shapes, shapeCount);
         }
     }
 }
@@ -342,12 +378,16 @@ void Menu::draw(sf::RenderWindow& window)
         window.setView(gameCamera->getView());
 
         for (int i = 0; i < shapeCount; i++)
+        {
+            if (!shapes[i] || shapes[i]->isCollected())
+                continue;
             shapes[i]->draw(window);
+        }
 
         gameBall->draw(window);
 
-        // reset view back to default so menu elements aren't affected
         window.setView(window.getDefaultView());
+      
     }
     else if (currentScreen == Screen::CreatorsMenu)
     {

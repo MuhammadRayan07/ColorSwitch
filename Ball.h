@@ -19,4 +19,8 @@ public:
     void setVelocityY(float v);
     float getVelocityY() const;
     void addVelocityY(float value);
+    void setRandomColor();
+    float getRadius() const;
+    sf::Color getColor() const;
+    void setColor(sf::Color newColor);
 };

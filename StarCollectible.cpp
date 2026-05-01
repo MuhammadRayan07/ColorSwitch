@@ -3,6 +3,10 @@
 
 StarCollectible::StarCollectible(float x, float y)
 {
+    centerX = x;
+    centerY = y;
+    posY = y;
+
     if (!texture.loadFromFile("ColorSwitchSprites/Star.png"))
         std::cout << "Star NOT loaded\n";
 

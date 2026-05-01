@@ -12,6 +12,8 @@
 #include "StarCollectible.h"
 #include "GameUtils.h"
 #include "Globals.h"
+#include"Rotation.h"
+#include"Collision.h"
 enum class Screen
 {
     MainMenu,
@@ -35,6 +37,7 @@ public:
     bool shouldClose() const { return wantsClose; }
 
 private:
+    int score = 0;
     float easySpeed = 90.f;
     float mediumSpeed = 160.f;
     float hardSpeed = 240.f;

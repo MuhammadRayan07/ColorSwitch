@@ -8,7 +8,7 @@ int main()
         "Color Switch"
     );
     window.setFramerateLimit(60);
-    srand(time(0));
+    srand(static_cast<unsigned int>(time(0)));
     Menu menu;
 
     sf::Clock dtClock;

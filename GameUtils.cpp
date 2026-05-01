@@ -47,8 +47,8 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
     else
     {
         float gapX = 170.f;
-        addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 150.f));
-        addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f));
+        addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 150.f, -1.0f));
+        addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f, 1.0f));
     }
 
     addShape(shapes, count, capacity, new StarCollectible(x, y));
@@ -94,4 +94,11 @@ void updateCamera(Camera& camera, Ball& ball, int width, int height)
         camera.setCenter(width / 2.f, height / 2.f);
         camera.setCameraVelocity(0.f);
     }
+}
+void removeFirst(Shape**& shapes, int& count)
+{
+    delete shapes[0];
+    for (int i = 1; i < count; i++)
+        shapes[i - 1] = shapes[i];
+    count--;
 }

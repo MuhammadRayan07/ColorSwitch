@@ -2,6 +2,11 @@
 
 RectangleShapeObj::RectangleShapeObj(float x, float y)
 {
+    posY = y;
+    centerX = x;
+    centerY = y;
+    halfHeight = 140.f;
+
     float size = 250.f;
     float thick = 20.f;
 
@@ -22,17 +27,70 @@ RectangleShapeObj::RectangleShapeObj(float x, float y)
 
     sf::Color colors[4];
     getShuffledColors(colors);
+    colorTop = colors[0];
+    colorBottom = colors[1];
+    colorLeft = colors[2];
+    colorRight = colors[3];
+    top.setFillColor(colorTop);
+    bottom.setFillColor(colorBottom);
+    left.setFillColor(colorLeft);
+    right.setFillColor(colorRight);
+}
 
-    top.setFillColor(colors[0]);
-    bottom.setFillColor(colors[1]);
-    left.setFillColor(colors[2]);
-    right.setFillColor(colors[3]);
+bool RectangleShapeObj::isBallTouching(sf::Vector2f ballPos, float ballRadius) const
+{
+    sf::Vector2f local = rotatePointBack(ballPos, centerX, centerY, currentRotation);
+
+    float halfSize = 125.f;
+    float thick = 20.f;
+
+    bool touchTop =
+        local.y + ballRadius >= -halfSize &&
+        local.y - ballRadius <= -halfSize + thick &&
+        local.x >= -halfSize && local.x <= halfSize;
+
+    bool touchBottom =
+        local.y + ballRadius >= halfSize - thick &&
+        local.y - ballRadius <= halfSize &&
+        local.x >= -halfSize && local.x <= halfSize;
+
+    bool touchLeft =
+        local.x + ballRadius >= -halfSize &&
+        local.x - ballRadius <= -halfSize + thick &&
+        local.y >= -halfSize && local.y <= halfSize;
+
+    bool touchRight =
+        local.x + ballRadius >= halfSize - thick &&
+        local.x - ballRadius <= halfSize &&
+        local.y >= -halfSize && local.y <= halfSize;
+
+    return touchTop || touchBottom || touchLeft || touchRight;
+}
+
+sf::Color RectangleShapeObj::getCurrentTouchColor(sf::Vector2f ballPos) const
+{
+    sf::Vector2f local = rotatePointBack(ballPos, centerX, centerY, currentRotation);
+
+    if (std::abs(local.x) > std::abs(local.y))
+        return local.x < 0 ? colorLeft : colorRight;
+    else
+        return local.y < 0 ? colorTop : colorBottom;
+}
+
+void RectangleShapeObj::rotateShape(float angle)
+{
+    currentRotation += angle;
 }
 
 void RectangleShapeObj::draw(sf::RenderWindow& window)
 {
-    window.draw(left);
-    window.draw(right);
-    window.draw(top);
-    window.draw(bottom);
+    sf::RenderStates states;
+    states.transform.translate({ centerX, centerY });
+    states.transform.rotate(sf::degrees(currentRotation));
+    states.transform.translate({ -centerX, -centerY });
+
+    window.draw(left, states);
+    window.draw(right, states);
+    window.draw(top, states);
+    window.draw(bottom, states);
 }
