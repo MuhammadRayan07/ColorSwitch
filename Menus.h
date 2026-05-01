@@ -1,7 +1,17 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "AnimatedBall.h"
-#include "Game.h"
+#include "Ball.h"
+#include "Camera.h"
+#include "Shape.h"
+#include "CircleShapeObj.h"
+#include "RectangleShapeObj.h"
+#include "TriangleShapeObj.h"
+#include "HorizontalLine.h"
+#include "PlusShape.h"
+#include "StarCollectible.h"
+#include "GameUtils.h"
+#include "Globals.h"
 enum class Screen
 {
     MainMenu,

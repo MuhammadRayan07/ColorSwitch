@@ -2,13 +2,13 @@
 #include "Menus.h"
 
 int main()
-{
+{ 
     sf::RenderWindow window(
         sf::VideoMode({ 800, 900 }),
         "Color Switch"
     );
     window.setFramerateLimit(60);
-
+    srand(time(0));
     Menu menu;
 
     sf::Clock dtClock;
