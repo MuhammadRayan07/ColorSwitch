@@ -5,8 +5,18 @@
 Menu::Menu()
     : leftBall(180.f, sf::Color(255, 0, 180))
     , rightBall(630.f, sf::Color(0, 220, 255))
+    , leftBall2(80.f, sf::Color(255, 0, 0))
+    , rightBall2(720.f, sf::Color(255, 255, 0))
     , currentScreen(Screen::MainMenu)
     , wantsClose(false)
+    , gameBall(nullptr)
+    , gameCamera(nullptr)
+    , shapes(nullptr)
+    , shapeCount(0)
+    , shapeCapacity(0)
+    , lastSpawnY(0.f)
+    , gravity(0.f)
+    , jumpStrength(0.f)
 {
   
     if (!logoTex.loadFromFile("ColorSwitchSprites/Colorswitch.png") ||
@@ -17,7 +27,11 @@ Menu::Menu()
         !highTex.loadFromFile("ColorSwitchSprites/Highscore.png") ||
         !aboutTex.loadFromFile("ColorSwitchSprites/About.png") ||
         !creatorPageTex.loadFromFile("ColorSwitchSprites/Creatorsmenu.png") ||
-        !detailsTex.loadFromFile("ColorSwitchSprites/Aboutmenu.png"))
+        !detailsTex.loadFromFile("ColorSwitchSprites/Aboutmenu.png") ||
+        !easyTex.loadFromFile("ColorSwitchSprites/Easymenu.png") ||
+        !mediumTex.loadFromFile("ColorSwitchSprites/Mediummenu.png") ||
+        !hardTex.loadFromFile("ColorSwitchSprites/Hardmenu.png")||
+        !ringTex.loadFromFile("ColorSwitchSprites/Ring.png"))
     {
         std::cout << "Failed loading textures\n";
     }
@@ -31,8 +45,14 @@ Menu::Menu()
     about = new sf::Sprite(aboutTex);
     creatorPage = new sf::Sprite(creatorPageTex);
     details = new sf::Sprite(detailsTex);
+    easyMenu = new sf::Sprite(easyTex);
+    mediumMenu = new sf::Sprite(mediumTex);
+    hardMenu = new sf::Sprite(hardTex);
+    ring1 = new sf::Sprite(ringTex);
+    ring2 = new sf::Sprite(ringTex);
 
-  
+    centerOrigin(ring1);
+    centerOrigin(ring2);
     centerOrigin(logo);
     centerOrigin(play);
     centerOrigin(star);
@@ -43,6 +63,10 @@ Menu::Menu()
     centerOrigin(about);
     centerOrigin(creatorPage);
     centerOrigin(details);
+    centerOrigin(easyMenu);
+    centerOrigin(mediumMenu);
+    centerOrigin(hardMenu);
+
 
     
     logo->setScale({ 0.70f, 0.70f });
@@ -55,6 +79,11 @@ Menu::Menu()
     about->setScale({ 0.40f, 0.40f });
     creatorPage->setScale({ 0.80f, 0.80f });
     details->setScale({ 0.85f, 0.85f });
+    easyMenu->setScale({ 0.63f, 0.63f });
+    mediumMenu->setScale({ 0.62f, 0.62f });
+    hardMenu->setScale({ 0.60f, 0.60f });
+    ring1->setScale({ 0.15f, 0.15f });
+    ring2->setScale({ 0.15f, 0.15f });
 
     logo->setPosition({ 400.f, 150.f });
     play->setPosition({ 400.f, 450.f });
@@ -64,6 +93,9 @@ Menu::Menu()
     about->setPosition({ 400.f, 820.f });
     creatorPage->setPosition({ 400.f, 450.f });
     details->setPosition({ 360.f, 450.f });
+    easyMenu->setPosition({ 400.f, 400.f });
+    mediumMenu->setPosition({ 390.f, 580.f });
+    hardMenu->setPosition({ 400.f, 760.f });
 }
 
 Menu::~Menu()
@@ -78,8 +110,65 @@ Menu::~Menu()
     delete about;
     delete creatorPage;
     delete details;
+    delete easyMenu;
+    delete mediumMenu;
+    delete hardMenu;
+    delete ring1;
+    delete ring2;
+    cleanupGame();
 }
+void Menu::startGame()
+{
+    cleanupGame();
 
+    const int width = 800;
+    const int height = 900;
+    const float groundY = 880.f;
+    const float gap = 700.f;
+    const float centerX = width / 2.f;
+    const float baseY = 100.f;
+
+    gravity = 0.5f;
+    jumpStrength = -10.f;
+
+    gameBall = new Ball(20.f, centerX, groundY);
+    gameCamera = new Camera((float)width, (float)height);
+    shapeCapacity = 10;
+    shapeCount = 0;
+    shapes = new Shape * [shapeCapacity];
+    lastSpawnY = baseY;
+
+    for (int i = 0; i < 5; i++)
+    {
+        spawnShape(shapes, shapeCount, shapeCapacity, centerX, lastSpawnY, width);
+        lastSpawnY -= gap;
+    }
+}
+void Menu::cleanupGame()
+{
+    if (shapes != nullptr)
+    {
+        for (int i = 0; i < shapeCount; i++)
+            delete shapes[i];
+        delete[] shapes;
+        shapes = nullptr;
+    }
+
+    if (gameBall != nullptr)
+    {
+        delete gameBall;
+        gameBall = nullptr;
+    }
+
+    if (gameCamera != nullptr)
+    {
+        delete gameCamera;
+        gameCamera = nullptr;
+    }
+
+    shapeCount = 0;
+    shapeCapacity = 0;
+}
 void Menu::centerOrigin(sf::Sprite* s)
 {
     auto size = s->getTexture().getSize();
@@ -102,6 +191,9 @@ void Menu::handleEvent(const sf::Event& event)
             else
                 wantsClose = true;
         }
+        if (key->scancode == sf::Keyboard::Scancode::Space)
+            if (currentScreen == Screen::GameScreen && gameBall)
+                gameBall->setVelocityY(jumpStrength);
     }
 
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>())
@@ -120,19 +212,49 @@ void Menu::handleEvent(const sf::Event& event)
                 else if (clicked(high, mousePos)) currentScreen = Screen::HighscoreMenu;
                 else if (clicked(about, mousePos)) currentScreen = Screen::AboutMenu;
             }
+            else if (currentScreen == Screen::PlayMenu)
+            {
+                if (clicked(easyMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
+                else if (clicked(mediumMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
+                else if (clicked(hardMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
+            }
         }
     }
 }
 
 void Menu::update(float dt, float t)
 {
+    currentTime = t;
     leftBall.update(dt);
     rightBall.update(dt);
+    leftBall2.update(dt);
+    rightBall2.update(dt);
 
     star->setPosition({ 400.f, 275.f + sin(t * 2.f) * 10.f });
 
     plus->setRotation(sf::degrees(t * 80.f));
     plus2->setRotation(sf::degrees(t * 80.f));
+
+    ring1->setRotation(sf::degrees(t * easySpeed));    
+    ring2->setRotation(sf::degrees(-(t * easySpeed)));
+    if (currentScreen == Screen::GameScreen && gameBall && gameCamera)
+    {
+        const int width = 800;
+        const int height = 900;
+        const float gap = 700.f;
+
+        applyGravity(*gameBall, gravity);
+        moveBall(*gameBall);
+        resetBallOnGround(*gameBall, 880.f);
+        updateCamera(*gameCamera, *gameBall, width, height);
+
+        if (gameBall->getPosition().y < lastSpawnY + gap)
+        {
+            spawnShape(shapes, shapeCount, shapeCapacity,
+                width / 2.f, lastSpawnY, width);
+            lastSpawnY -= gap;
+        }
+    }
 }
 
 void Menu::draw(sf::RenderWindow& window)
@@ -156,7 +278,49 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::PlayMenu)
     {
-        //  level select
+        window.draw(*logo);
+
+        plus->setPosition({ 180.f, 125.f });
+        plus2->setPosition({ 620.f, 125.f });
+        leftBall2.draw(window);
+        rightBall2.draw(window);
+        window.draw(*plus);
+        window.draw(*plus2);
+        window.draw(*star);
+
+        window.draw(*easyMenu);
+        ring1->setPosition({ 250.f,382.f });   // left ring inside easy button
+        ring2->setPosition({ 553.f, 382.f });   // right ring inside easy button
+        ring1->setRotation(sf::degrees(currentTime * easySpeed));
+        ring2->setRotation(sf::degrees(-(currentTime * easySpeed)));
+        window.draw(*ring1);
+        window.draw(*ring2);
+        window.draw(*mediumMenu);
+        ring1->setPosition({ 250.f, 555.f });
+        ring2->setPosition({ 553.f, 555.f });
+        ring1->setRotation(sf::degrees(currentTime * mediumSpeed));
+        ring2->setRotation(sf::degrees(-(currentTime * mediumSpeed)));
+        window.draw(*ring1);
+        window.draw(*ring2);
+        window.draw(*hardMenu);
+        ring1->setPosition({ 250.f, 733.f });
+        ring2->setPosition({ 555.f, 733.f });
+        ring1->setRotation(sf::degrees(currentTime * hardSpeed));
+        ring2->setRotation(sf::degrees(-(currentTime * hardSpeed)));
+        window.draw(*ring1);
+        window.draw(*ring2);
+    }
+    else if (currentScreen == Screen::GameScreen)
+    {
+        window.setView(gameCamera->getView());
+
+        for (int i = 0; i < shapeCount; i++)
+            shapes[i]->draw(window);
+
+        gameBall->draw(window);
+
+        // reset view back to default so menu elements aren't affected
+        window.setView(window.getDefaultView());
     }
     else if (currentScreen == Screen::CreatorsMenu)
     {

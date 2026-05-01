@@ -135,9 +135,10 @@
   <ItemGroup>
     <ClCompile Include="AnimatedBall.cpp" />
     <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menus.cpp" />
-    <ClCompile Include="Shapes.cpp" />
+    <ClCompile Include="Game.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedBall.h" />
