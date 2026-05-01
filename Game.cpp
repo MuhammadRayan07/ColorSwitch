@@ -55,7 +55,7 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
     else
     {
         float gapX = 170.f;
-        addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 120.f));
+        addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 130.f));
         addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f));
     }
 
