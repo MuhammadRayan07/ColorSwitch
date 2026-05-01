@@ -1,32 +1,23 @@
-#include "Game.h"
+#include "GameUtils.h"
+#include "CircleShapeObj.h"
+#include "RectangleShapeObj.h"
+#include "TriangleShapeObj.h"
+#include "HorizontalLine.h"
+#include "PlusShape.h"
+#include "StarCollectible.h"
 
-// ---- palette and getShuffledColors ----
-sf::Color palette[4] = {
-    sf::Color(50,  226, 241),
-    sf::Color(255, 232, 15),
-    sf::Color(140, 18,  251),
-    sf::Color(255, 0,   128)
-};
+#include <cstdlib>
 
-void getShuffledColors(sf::Color colors[4])
-{
-    for (int i = 0; i < 4; i++)
-        colors[i] = palette[i];
+// ================= EXISTING =================
 
-    for (int i = 3; i > 0; i--)
-    {
-        int j = rand() % (i + 1);
-        std::swap(colors[i], colors[j]);
-    }
-}
-
-// ---- Free functions ----
 void resizeArray(Shape**& shapes, int& capacity)
 {
     int newCapacity = capacity * 2;
     Shape** newArr = new Shape * [newCapacity];
+
     for (int i = 0; i < capacity; i++)
         newArr[i] = shapes[i];
+
     delete[] shapes;
     shapes = newArr;
     capacity = newCapacity;
@@ -36,6 +27,7 @@ void addShape(Shape**& shapes, int& count, int& capacity, Shape* newShape)
 {
     if (count >= capacity)
         resizeArray(shapes, capacity);
+
     shapes[count++] = newShape;
 }
 
@@ -60,14 +52,6 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
     }
 
     addShape(shapes, count, capacity, new StarCollectible(x, y));
-}
-
-void removeFirst(Shape**& shapes, int& count)
-{
-    delete shapes[0];
-    for (int i = 1; i < count; i++)
-        shapes[i - 1] = shapes[i];
-    count--;
 }
 
 void applyGravity(Ball& ball, float gravity)

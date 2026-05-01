@@ -2,7 +2,7 @@
 #include "Menus.h"
 
 int main()
-{
+{ 
     sf::RenderWindow window(
         sf::VideoMode({ 800, 900 }),
         "Color Switch"
