@@ -135,15 +135,20 @@
   <ItemGroup>
     <ClCompile Include="AnimatedBall.cpp" />
     <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menus.cpp" />
     <ClCompile Include="Game.h" />
+    <ClCompile Include="rotation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedBall.h" />
     <ClInclude Include="Assets.h" />
+    <ClInclude Include="Collision.h" />
+    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Menus.h" />
+    <ClInclude Include="Rotation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

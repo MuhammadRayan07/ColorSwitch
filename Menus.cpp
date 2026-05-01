@@ -1,6 +1,9 @@
 #include "Menus.h"
+#include"Rotation.h"
+#include "Collision.h"
 #include <iostream>
 #include <cmath>
+bool spacePressed = false;
 
 Menu::Menu()
     : leftBall(180.f, sf::Color(255, 0, 180))
@@ -119,6 +122,7 @@ Menu::~Menu()
 }
 void Menu::startGame()
 {
+    score = 0;
     cleanupGame();
 
     const int width = 800;
@@ -131,7 +135,7 @@ void Menu::startGame()
     gravity = 0.5f;
     jumpStrength = -10.f;
 
-    gameBall = new Ball(20.f, centerX, groundY);
+    gameBall = new Ball(10.f, centerX, groundY);
     gameCamera = new Camera((float)width, (float)height);
     shapeCapacity = 10;
     shapeCount = 0;
@@ -182,6 +186,7 @@ bool Menu::clicked(sf::Sprite* s, sf::Vector2f mouse)
 
 void Menu::handleEvent(const sf::Event& event)
 {
+    // KEY PRESSED
     if (auto* key = event.getIf<sf::Event::KeyPressed>())
     {
         if (key->scancode == sf::Keyboard::Scancode::Escape)
@@ -191,11 +196,29 @@ void Menu::handleEvent(const sf::Event& event)
             else
                 wantsClose = true;
         }
+
         if (key->scancode == sf::Keyboard::Scancode::Space)
-            if (currentScreen == Screen::GameScreen && gameBall)
-                gameBall->setVelocityY(jumpStrength);
+        {
+            if (!spacePressed)
+            {
+                spacePressed = true;
+
+                if (currentScreen == Screen::GameScreen && gameBall)
+                    gameBall->setVelocityY(jumpStrength);
+            }
+        }
     }
 
+    // KEY RELEASED
+    if (auto* key = event.getIf<sf::Event::KeyReleased>())
+    {
+        if (key->scancode == sf::Keyboard::Scancode::Space)
+        {
+            spacePressed = false;
+        }
+    }
+
+    // MOUSE
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>())
     {
         if (mb->button == sf::Mouse::Button::Left)
@@ -207,24 +230,32 @@ void Menu::handleEvent(const sf::Event& event)
 
             if (currentScreen == Screen::MainMenu)
             {
-                if (clicked(play, mousePos)) currentScreen = Screen::PlayMenu;
-                else if (clicked(creators, mousePos)) currentScreen = Screen::CreatorsMenu;
-                else if (clicked(high, mousePos)) currentScreen = Screen::HighscoreMenu;
-                else if (clicked(about, mousePos)) currentScreen = Screen::AboutMenu;
+                if (clicked(play, mousePos))
+                    currentScreen = Screen::PlayMenu;
+                else if (clicked(creators, mousePos))
+                    currentScreen = Screen::CreatorsMenu;
+                else if (clicked(high, mousePos))
+                    currentScreen = Screen::HighscoreMenu;
+                else if (clicked(about, mousePos))
+                    currentScreen = Screen::AboutMenu;
             }
             else if (currentScreen == Screen::PlayMenu)
             {
-                if (clicked(easyMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
-                else if (clicked(mediumMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
-                else if (clicked(hardMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
+                if (clicked(easyMenu, mousePos) ||
+                    clicked(mediumMenu, mousePos) ||
+                    clicked(hardMenu, mousePos))
+                {
+                    startGame();
+                    currentScreen = Screen::GameScreen;
+                }
             }
         }
     }
 }
-
 void Menu::update(float dt, float t)
 {
     currentTime = t;
+
     leftBall.update(dt);
     rightBall.update(dt);
     leftBall2.update(dt);
@@ -235,8 +266,9 @@ void Menu::update(float dt, float t)
     plus->setRotation(sf::degrees(t * 80.f));
     plus2->setRotation(sf::degrees(t * 80.f));
 
-    ring1->setRotation(sf::degrees(t * easySpeed));    
+    ring1->setRotation(sf::degrees(t * easySpeed));
     ring2->setRotation(sf::degrees(-(t * easySpeed)));
+
     if (currentScreen == Screen::GameScreen && gameBall && gameCamera)
     {
         const int width = 800;
@@ -252,11 +284,26 @@ void Menu::update(float dt, float t)
         {
             spawnShape(shapes, shapeCount, shapeCapacity,
                 width / 2.f, lastSpawnY, width);
+
             lastSpawnY -= gap;
+        }
+
+        rotateAllShapes(shapes, shapeCount, 1.0f);
+
+        if (checkStarCollection(*gameBall, shapes, shapeCount))
+        {
+            score++;
+            std::cout << "Score: " << score << std::endl;
+        }
+
+        checkShapePassCollision(*gameBall, shapes, shapeCount);
+
+        if (checkWrongColorCollision(*gameBall, shapes, shapeCount))
+        {
+            currentScreen = Screen::MainMenu;
         }
     }
 }
-
 void Menu::draw(sf::RenderWindow& window)
 {
     if (currentScreen == Screen::MainMenu)
@@ -315,7 +362,12 @@ void Menu::draw(sf::RenderWindow& window)
         window.setView(gameCamera->getView());
 
         for (int i = 0; i < shapeCount; i++)
+        {
+            if (!shapes[i] || shapes[i]->isCollected())
+                continue;
+
             shapes[i]->draw(window);
+        }
 
         gameBall->draw(window);
 

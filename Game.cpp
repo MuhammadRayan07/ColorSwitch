@@ -55,8 +55,8 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
     else
     {
         float gapX = 170.f;
-        addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 150.f));
-        addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f));
+        addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 150.f,-1.0f));
+        addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f,1.0f));
     }
 
     addShape(shapes, count, capacity, new StarCollectible(x, y));

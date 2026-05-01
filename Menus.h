@@ -35,6 +35,7 @@ private:
     Shape** shapes;
     int      shapeCount;
     int      shapeCapacity;
+    int score = 0;
     float    lastSpawnY;
     float    gravity;
     float    jumpStrength;
