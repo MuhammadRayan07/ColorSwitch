@@ -104,30 +104,39 @@ class TriangleShapeObj : public Shape
 {
 private:
     sf::RectangleShape left, right, bottom;
+    float centerX, centerY;
 
 public:
     TriangleShapeObj(float x, float y)
     {
-        float base = 200.f;
+        centerX = x;
+        centerY = y;
+        float base = 260.f;
         float thickness = 20.f;
-        float sideLength = 230.f;
         float angle = 60.f;
-        float baseY = y + 80.f;
+
+        // Correct side length (same as base for equilateral triangle)
+        float sideLength = base + 5.f;
 
         sf::Color colors[4];
         getShuffledColors(colors);
 
+        float baseY = y + 80.f;
+
+        // Bottom
         bottom.setSize({ base, thickness });
         bottom.setOrigin({ base / 2.f, thickness / 2.f });
         bottom.setPosition({ x, baseY });
         bottom.setFillColor(colors[0]);
 
+        // Left side
         left.setSize({ sideLength, thickness });
         left.setOrigin({ 0.f, thickness / 2.f });
         left.setPosition({ x - base / 2.f, baseY });
         left.setRotation(sf::degrees(-angle));
         left.setFillColor(colors[1]);
 
+        // Right side
         right.setSize({ sideLength, thickness });
         right.setOrigin({ sideLength, thickness / 2.f });
         right.setPosition({ x + base / 2.f, baseY });
