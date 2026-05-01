@@ -44,6 +44,8 @@ private:
     sf::Texture creatorPageTex, detailsTex;
     sf::Texture easyTex, mediumTex, hardTex;
     sf::Texture ringTex;
+    sf::Texture highScoreMenuTex;
+        
 
     sf::Sprite* ring1;
     sf::Sprite* ring2;
@@ -60,6 +62,12 @@ private:
     sf::Sprite* about;
     sf::Sprite* creatorPage;
     sf::Sprite* details;
+    sf::Sprite* highScoreMenu;
+    sf::Sprite* bigRing;
+    sf::Sprite* bigRing2;
+    sf::Sprite* bigRing3;
+    sf::Sprite* bigRing4;
+    sf::Sprite* bigRing5;
 
     AnimatedBall leftBall;
     AnimatedBall rightBall;

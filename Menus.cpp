@@ -31,7 +31,8 @@ Menu::Menu()
         !easyTex.loadFromFile("ColorSwitchSprites/Easymenu.png") ||
         !mediumTex.loadFromFile("ColorSwitchSprites/Mediummenu.png") ||
         !hardTex.loadFromFile("ColorSwitchSprites/Hardmenu.png")||
-        !ringTex.loadFromFile("ColorSwitchSprites/Ring.png"))
+        !ringTex.loadFromFile("ColorSwitchSprites/Ring.png")||
+        !highScoreMenuTex.loadFromFile("ColorSwitchSprites/Hs.png"))
     {
         std::cout << "Failed loading textures\n";
     }
@@ -50,6 +51,18 @@ Menu::Menu()
     hardMenu = new sf::Sprite(hardTex);
     ring1 = new sf::Sprite(ringTex);
     ring2 = new sf::Sprite(ringTex);
+    highScoreMenu = new sf::Sprite(highScoreMenuTex);
+    bigRing = new sf::Sprite(ringTex);   
+    bigRing2 = new sf::Sprite(ringTex);
+    bigRing3 = new sf::Sprite(ringTex);
+    bigRing4 = new sf::Sprite(ringTex);
+    bigRing5 = new sf::Sprite(ringTex);
+    centerOrigin(highScoreMenu);
+    centerOrigin(bigRing);
+    centerOrigin(bigRing2);
+    centerOrigin(bigRing3);
+    centerOrigin(bigRing4);
+    centerOrigin(bigRing5);
 
     centerOrigin(ring1);
     centerOrigin(ring2);
@@ -67,8 +80,6 @@ Menu::Menu()
     centerOrigin(mediumMenu);
     centerOrigin(hardMenu);
 
-
-    
     logo->setScale({ 0.70f, 0.70f });
     play->setScale({ 0.70f, 0.70f });
     star->setScale({ 0.40f, 0.40f });
@@ -84,6 +95,12 @@ Menu::Menu()
     hardMenu->setScale({ 0.60f, 0.60f });
     ring1->setScale({ 0.15f, 0.15f });
     ring2->setScale({ 0.15f, 0.15f });
+    highScoreMenu->setScale({ 0.6f, 0.6f });
+    bigRing->setScale({ 0.98f, 0.98f }); 
+    bigRing2->setScale({ 0.7f, 0.7f }); 
+    bigRing3->setScale({ 0.7f, 0.7f }); 
+    bigRing4->setScale({ 0.7f, 0.7f }); 
+    bigRing5->setScale({ 0.7f, 0.7f });
 
     logo->setPosition({ 400.f, 150.f });
     play->setPosition({ 400.f, 450.f });
@@ -96,6 +113,12 @@ Menu::Menu()
     easyMenu->setPosition({ 400.f, 400.f });
     mediumMenu->setPosition({ 390.f, 580.f });
     hardMenu->setPosition({ 400.f, 760.f });
+    highScoreMenu->setPosition({ 400.f, 190.f });
+    bigRing->setPosition({ 400.f, 575.f });   
+    bigRing2->setPosition({ -50.0f, 457.f });
+    bigRing3->setPosition({ 830.f, 429.f });
+    bigRing4->setPosition({ 60.f, 905.f });
+    bigRing5->setPosition({ 738.f, 880.f });
 }
 
 Menu::~Menu()
@@ -115,6 +138,8 @@ Menu::~Menu()
     delete hardMenu;
     delete ring1;
     delete ring2;
+    delete highScoreMenu;
+    delete bigRing;
     cleanupGame();
 }
 void Menu::startGame()
@@ -237,6 +262,8 @@ void Menu::update(float dt, float t)
 
     ring1->setRotation(sf::degrees(t * easySpeed));    
     ring2->setRotation(sf::degrees(-(t * easySpeed)));
+
+    bigRing->setRotation(sf::degrees(currentTime * 30.f));  
     if (currentScreen == Screen::GameScreen && gameBall && gameCamera)
     {
         const int width = 800;
@@ -336,7 +363,16 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::HighscoreMenu)
     {
-        // score table
+        window.draw(*highScoreMenu);
+        plus->setPosition({ 160.f, 120.f });
+        plus2->setPosition({ 640.f, 120.f });
+        window.draw(*plus);
+        window.draw(*plus2);
+        window.draw(*bigRing);
+        window.draw(*bigRing2);
+        window.draw(*bigRing3);
+        window.draw(*bigRing4);
+        window.draw(*bigRing5);
     }
     else if (currentScreen == Screen::AboutMenu)
     {
