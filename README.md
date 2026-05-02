@@ -20,9 +20,9 @@ A C++ recreation of the classic **Color Switch** mobile game built with **SFML 3
 
 | Level  | Shape Size | Rotation Speed |
 |--------|------------|----------------|
-| Easy   | 1.5×       | 0.4°/frame     |
-| Medium | 1.25×      | 0.7°/frame     |
-| Hard   | 1.0×       | 1.0°/frame     |
+| Easy   | 1.5×       | 0.7°/frame     |
+| Medium | 1.25×      | 1.0°/frame     |
+| Hard   | 1.0×       | 1.5°/frame     |
 
 Hard mode also spawns **two Plus shapes** side by side instead of one.
 
