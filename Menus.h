@@ -16,6 +16,8 @@
 #include "Collision.h"
 #include"difficulty.h"
 #include <SFML/Audio.hpp>
+#include "ScoreManager.h"
+
 enum class Screen
 {
     MainMenu,
@@ -37,14 +39,15 @@ public:
     bool shouldClose() const { return wantsClose; }
 
 private:
-    int highScore = 0;
-    int score = 0;
+    ScoreManager scoreManager;
     float easySpeed = 90.f;
     float mediumSpeed = 160.f;
     float hardSpeed = 240.f;
-    float currentTime;
+    float currentTime = 0.f;
     bool isGameOver = false;
     bool ballHasLaunched = false;
+    bool gameStarted = false;        // add this
+    bool gameOverMusicPlayed = false;
 
     // game members
     Ball* gameBall;
@@ -65,11 +68,9 @@ private:
     sf::Texture ringTex;
     sf::Texture highScoreMenuTex;
     sf::Texture gameOverTex, homeTex, continueTex;
-
     sf::Font    font;
     sf::Text* scoreText;
     sf::Text* highScoreText;
-
 
     sf::Sprite* ring1;
     sf::Sprite* ring2;
@@ -101,21 +102,18 @@ private:
     AnimatedBall leftBall2;
     AnimatedBall rightBall2;
 
-    sf::Music homeMusic;
-    sf::Music gameOverMusic;
-
+    sf::Music       homeMusic;
+    sf::Music       gameOverMusic;
     sf::SoundBuffer bounceBuffer;
     sf::SoundBuffer buttonBuffer;
-    sf::Sound *      bounceSound;
-    sf::Sound *     buttonSound;
+    sf::Sound* bounceSound;
+    sf::Sound* buttonSound;
 
     Screen currentScreen;
     bool   wantsClose;
-    bool gameOverMusicPlayed = false;
+
     void centerOrigin(sf::Sprite* s);
     bool clicked(sf::Sprite* s, sf::Vector2f mouse);
     void startGame(Difficulty diff);
     void cleanupGame();
-    void loadHighScore();
-    void saveHighScore();
 };

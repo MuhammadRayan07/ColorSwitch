@@ -3,8 +3,9 @@
 #include <cmath>
 #include "Rotation.h"
 #include "Collision.h"
-#include <fstream>
+
 bool spacePressed = false;
+
 Menu::Menu()
     : leftBall(180.f, sf::Color(255, 0, 180))
     , rightBall(630.f, sf::Color(0, 220, 255))
@@ -23,7 +24,8 @@ Menu::Menu()
     , rotationSpeed(1.0f)
     , currentDifficulty(Difficulty::Hard)
 {
-    loadHighScore();
+    scoreManager.load();
+
     if (!logoTex.loadFromFile("ColorSwitchSprites/Colorswitch.png") ||
         !playTex.loadFromFile("ColorSwitchSprites/Play.png") ||
         !starTex.loadFromFile("ColorSwitchSprites/Star.png") ||
@@ -35,19 +37,18 @@ Menu::Menu()
         !detailsTex.loadFromFile("ColorSwitchSprites/Aboutmenu.png") ||
         !easyTex.loadFromFile("ColorSwitchSprites/Easymenu.png") ||
         !mediumTex.loadFromFile("ColorSwitchSprites/Mediummenu.png") ||
-        !hardTex.loadFromFile("ColorSwitchSprites/Hardmenu.png")||
-        !ringTex.loadFromFile("ColorSwitchSprites/Ring.png")||
-        !highScoreMenuTex.loadFromFile("ColorSwitchSprites/Hs.png")||
+        !hardTex.loadFromFile("ColorSwitchSprites/Hardmenu.png") ||
+        !ringTex.loadFromFile("ColorSwitchSprites/Ring.png") ||
+        !highScoreMenuTex.loadFromFile("ColorSwitchSprites/Hs.png") ||
         !gameOverTex.loadFromFile("ColorSwitchSprites/GameOver.png") ||
         !homeTex.loadFromFile("ColorSwitchSprites/Home.png") ||
         !continueTex.loadFromFile("ColorSwitchSprites/Continue.png"))
     {
         std::cout << "Failed loading textures\n";
     }
+
     if (!font.openFromFile("ColorSwitchSprites/arial.ttf"))
-    {
         std::cout << "Font not loaded\n";
-    }
 
     if (!homeMusic.openFromFile("ColorSwitchSprites/HomeMusic.ogg"))
         std::cout << "HomeMusic not loaded\n";
@@ -55,7 +56,6 @@ Menu::Menu()
     if (!gameOverMusic.openFromFile("ColorSwitchSprites/GameOverMusic.ogg"))
         std::cout << "GameOverMusic not loaded\n";
 
-    // Sound buffers
     if (!bounceBuffer.loadFromFile("ColorSwitchSprites/Bounce.ogg"))
         std::cout << "Bounce not loaded\n";
 
@@ -70,15 +70,14 @@ Menu::Menu()
     scoreText = new sf::Text(font);
     highScoreText = new sf::Text(font);
 
-    scoreText->setFont(font);
     scoreText->setCharacterSize(30);
     scoreText->setFillColor(sf::Color::White);
     scoreText->setPosition({ 10.f, 10.f });
 
-    highScoreText->setFont(font);
     highScoreText->setCharacterSize(150);
     highScoreText->setFillColor(sf::Color::Magenta);
-    highScoreText->setPosition({ 330.f, 490.f }); // adjust for menu
+    highScoreText->setPosition({ 330.f, 490.f });
+
     logo = new sf::Sprite(logoTex);
     play = new sf::Sprite(playTex);
     star = new sf::Sprite(starTex);
@@ -95,7 +94,7 @@ Menu::Menu()
     ring1 = new sf::Sprite(ringTex);
     ring2 = new sf::Sprite(ringTex);
     highScoreMenu = new sf::Sprite(highScoreMenuTex);
-    bigRing = new sf::Sprite(ringTex);   
+    bigRing = new sf::Sprite(ringTex);
     bigRing2 = new sf::Sprite(ringTex);
     bigRing3 = new sf::Sprite(ringTex);
     bigRing4 = new sf::Sprite(ringTex);
@@ -113,7 +112,6 @@ Menu::Menu()
     centerOrigin(gameOver);
     centerOrigin(homeBtn);
     centerOrigin(continueBtn);
-
     centerOrigin(ring1);
     centerOrigin(ring2);
     centerOrigin(logo);
@@ -146,10 +144,10 @@ Menu::Menu()
     ring1->setScale({ 0.15f, 0.15f });
     ring2->setScale({ 0.15f, 0.15f });
     highScoreMenu->setScale({ 0.6f, 0.6f });
-    bigRing->setScale({ 0.98f, 0.98f }); 
-    bigRing2->setScale({ 0.7f, 0.7f }); 
-    bigRing3->setScale({ 0.7f, 0.7f }); 
-    bigRing4->setScale({ 0.7f, 0.7f }); 
+    bigRing->setScale({ 0.98f, 0.98f });
+    bigRing2->setScale({ 0.7f, 0.7f });
+    bigRing3->setScale({ 0.7f, 0.7f });
+    bigRing4->setScale({ 0.7f, 0.7f });
     bigRing5->setScale({ 0.7f, 0.7f });
     gameOver->setScale({ 0.50f, 0.50f });
     homeBtn->setScale({ 0.47f, 0.47f });
@@ -167,7 +165,7 @@ Menu::Menu()
     mediumMenu->setPosition({ 390.f, 580.f });
     hardMenu->setPosition({ 400.f, 760.f });
     highScoreMenu->setPosition({ 400.f, 190.f });
-    bigRing->setPosition({ 400.f, 575.f });   
+    bigRing->setPosition({ 400.f, 575.f });
     bigRing2->setPosition({ -50.0f, 457.f });
     bigRing3->setPosition({ 830.f, 429.f });
     bigRing4->setPosition({ 60.f, 905.f });
@@ -178,32 +176,6 @@ Menu::Menu()
 
     homeMusic.setVolume(30.f);
     buttonSound->setVolume(50.f);
-}
-//filehandling
-void Menu::loadHighScore() 
-{
-    std::ifstream file("highscore.txt");
-
-    if (file.is_open())
-    {
-        file >> highScore;
-        file.close();
-    }
-    else
-    {
-        highScore = 0; // first time run
-    }
-}
-
-void Menu::saveHighScore()
-{
-    std::ofstream file("highscore.txt");
-
-    if (file.is_open())
-    {
-        file << highScore;
-        file.close();
-    }
 }
 
 Menu::~Menu()
@@ -238,16 +210,18 @@ Menu::~Menu()
     delete buttonSound;
     cleanupGame();
 }
+
 void Menu::startGame(Difficulty diff)
 {
     gameOverMusicPlayed = false;
     isGameOver = false;
     ballHasLaunched = false;
-    score = 0;
+    scoreManager.reset();
+    scoreManager.load();
     cleanupGame();
 
-    const int width = 800;
-    const int height = 900;
+    const int   width = 800;
+    const int   height = 900;
     const float groundY = 880.f;
     const float gap = 700.f;
     const float centerX = width / 2.f;
@@ -265,14 +239,13 @@ void Menu::startGame(Difficulty diff)
         jumpStrength = -10.f;
         rotationSpeed = 1.0f;
     }
-    else // Hard
+    else
     {
         gravity = 0.5f;
         jumpStrength = -10.f;
         rotationSpeed = 1.5f;
     }
 
-    // store difficulty for spawnShape
     currentDifficulty = diff;
 
     gameBall = new Ball(10.f, centerX, groundY);
@@ -287,7 +260,18 @@ void Menu::startGame(Difficulty diff)
         spawnShape(shapes, shapeCount, shapeCapacity, centerX, lastSpawnY, width, diff);
         lastSpawnY -= gap;
     }
+
+    // set ball to valid color of first obstacle
+    for (int i = shapeCount - 1; i >= 0; i--)
+    {
+        if (shapes[i] && shapes[i]->isObstacle())
+        {
+            gameBall->setColor(shapes[i]->getRandomAllowedColor());
+            break;
+        }
+    }
 }
+
 void Menu::cleanupGame()
 {
     if (shapes != nullptr)
@@ -313,6 +297,7 @@ void Menu::cleanupGame()
     shapeCount = 0;
     shapeCapacity = 0;
 }
+
 void Menu::centerOrigin(sf::Sprite* s)
 {
     auto size = s->getTexture().getSize();
@@ -330,6 +315,11 @@ void Menu::handleEvent(const sf::Event& event)
     {
         if (key->scancode == sf::Keyboard::Scancode::Escape)
         {
+            if (currentScreen == Screen::GameScreen)
+            {
+                gameStarted = false;
+                cleanupGame();
+            }
             if (currentScreen != Screen::MainMenu)
             {
                 buttonSound->play();
@@ -344,10 +334,10 @@ void Menu::handleEvent(const sf::Event& event)
             if (!spacePressed)
             {
                 spacePressed = true;
-                if (currentScreen == Screen::GameScreen && gameBall)
+                if (currentScreen == Screen::GameScreen && gameBall && !isGameOver)
                 {
                     gameBall->setVelocityY(jumpStrength);
-                    bounceSound->play();  
+                    bounceSound->play();
                 }
             }
         }
@@ -362,10 +352,7 @@ void Menu::handleEvent(const sf::Event& event)
     {
         if (mb->button == sf::Mouse::Button::Left)
         {
-            sf::Vector2f mousePos(
-                (float)mb->position.x,
-                (float)mb->position.y
-            );
+            sf::Vector2f mousePos((float)mb->position.x, (float)mb->position.y);
 
             if (currentScreen == Screen::MainMenu)
             {
@@ -416,12 +403,15 @@ void Menu::handleEvent(const sf::Event& event)
                 if (clicked(homeBtn, mousePos))
                 {
                     buttonSound->play();
+                    gameStarted = false;
+                    cleanupGame();
                     isGameOver = false;
                     currentScreen = Screen::MainMenu;
                 }
                 else if (clicked(continueBtn, mousePos))
                 {
                     buttonSound->play();
+                    gameStarted = false;
                     isGameOver = false;
                     startGame(currentDifficulty);
                     currentScreen = Screen::GameScreen;
@@ -433,12 +423,11 @@ void Menu::handleEvent(const sf::Event& event)
 
 void Menu::update(float dt, float t)
 {
-    // Music management
+    // music management
     if (isGameOver)
     {
         if (homeMusic.getStatus() == sf::Music::Status::Playing)
             homeMusic.stop();
-
         if (!gameOverMusicPlayed)
         {
             gameOverMusic.setLooping(false);
@@ -450,7 +439,6 @@ void Menu::update(float dt, float t)
     {
         if (homeMusic.getStatus() == sf::Music::Status::Playing)
             homeMusic.stop();
-
         if (gameOverMusic.getStatus() == sf::Music::Status::Playing)
             gameOverMusic.stop();
     }
@@ -458,13 +446,13 @@ void Menu::update(float dt, float t)
     {
         if (gameOverMusic.getStatus() == sf::Music::Status::Playing)
             gameOverMusic.stop();
-
         if (homeMusic.getStatus() != sf::Music::Status::Playing)
         {
             homeMusic.setLooping(true);
             homeMusic.play();
         }
     }
+
     currentTime = t;
     leftBall.update(dt);
     rightBall.update(dt);
@@ -472,74 +460,59 @@ void Menu::update(float dt, float t)
     rightBall2.update(dt);
 
     star->setPosition({ 400.f, 275.f + sin(t * 2.f) * 10.f });
-
     plus->setRotation(sf::degrees(t * 80.f));
     plus2->setRotation(sf::degrees(t * 80.f));
-
-    ring1->setRotation(sf::degrees(t * easySpeed));    
+    ring1->setRotation(sf::degrees(t * easySpeed));
     ring2->setRotation(sf::degrees(-(t * easySpeed)));
+    bigRing->setRotation(sf::degrees(currentTime * 30.f));
 
-    bigRing->setRotation(sf::degrees(currentTime * 30.f)); 
+    scoreText->setString("Score: " + std::to_string(scoreManager.getScore()));
+    highScoreText->setString(std::to_string(scoreManager.getHighScore()));
 
-    scoreText->setString("Score: " + std::to_string(score));
-    highScoreText->setString(  std::to_string(highScore));
-    
-    if (currentScreen == Screen::GameScreen && gameBall && gameCamera&&!isGameOver)
+    if (currentScreen == Screen::GameScreen && gameBall && gameCamera && !isGameOver)
     {
-        const int width = 800;
-        const int height = 900;
+        const int   width = 800;
+        const int   height = 900;
         const float gap = 700.f;
 
         applyGravity(*gameBall, gravity);
         moveBall(*gameBall);
         resetBallOnGround(*gameBall, 880.f);
-        // track when ball first jumps
+
         if (gameBall->getVelocityY() < 0.f)
             ballHasLaunched = true;
+
         if (ballHasLaunched && gameBall->getPosition().y >= 880.f && !isGameOver)
         {
-            if (score > highScore)
-            {
-                highScore = score;
-                saveHighScore();
-            }
+            scoreManager.save();
             isGameOver = true;
         }
+
         updateCamera(*gameCamera, *gameBall, width, height);
         rotateAllShapes(shapes, shapeCount, rotationSpeed);
 
         if (checkStarCollection(*gameBall, shapes, shapeCount))
         {
-            score++;
-
-            if (score > highScore)
-            {
-                highScore = score;
-                saveHighScore();
-            }
-
-            std::cout << "Score: " << score << "\n";
+            scoreManager.increment();
+            scoreManager.save();
+            std::cout << "Score: " << scoreManager.getScore() << "\n";
         }
-
-        
 
         checkShapePassCollision(*gameBall, shapes, shapeCount);
 
         if (!isGameOver && checkWrongColorCollision(*gameBall, shapes, shapeCount))
         {
-            if (score > highScore)
-            {
-                highScore = score;
-                saveHighScore();
-            }
+            scoreManager.save();
             isGameOver = true;
         }
 
         if (gameBall->getPosition().y < lastSpawnY + gap)
         {
-            spawnShape(shapes, shapeCount, shapeCapacity, width / 2.f, lastSpawnY, width, currentDifficulty);
+            spawnShape(shapes, shapeCount, shapeCapacity,
+                width / 2.f, lastSpawnY, width, currentDifficulty);
             lastSpawnY -= gap;
         }
+
         while (shapeCount > 0 &&
             shapes[0] != nullptr &&
             shapes[0]->getY() > gameCamera->getCenter().y + 600.f)
@@ -581,12 +554,13 @@ void Menu::draw(sf::RenderWindow& window)
         window.draw(*star);
 
         window.draw(*easyMenu);
-        ring1->setPosition({ 250.f,382.f });   // left ring inside easy button
-        ring2->setPosition({ 553.f, 382.f });   // right ring inside easy button
+        ring1->setPosition({ 250.f, 382.f });
+        ring2->setPosition({ 553.f, 382.f });
         ring1->setRotation(sf::degrees(currentTime * easySpeed));
         ring2->setRotation(sf::degrees(-(currentTime * easySpeed)));
         window.draw(*ring1);
         window.draw(*ring2);
+
         window.draw(*mediumMenu);
         ring1->setPosition({ 250.f, 555.f });
         ring2->setPosition({ 553.f, 555.f });
@@ -594,6 +568,7 @@ void Menu::draw(sf::RenderWindow& window)
         ring2->setRotation(sf::degrees(-(currentTime * mediumSpeed)));
         window.draw(*ring1);
         window.draw(*ring2);
+
         window.draw(*hardMenu);
         ring1->setPosition({ 250.f, 733.f });
         ring2->setPosition({ 555.f, 733.f });
@@ -614,12 +589,9 @@ void Menu::draw(sf::RenderWindow& window)
         }
 
         gameBall->draw(window);
-
         window.setView(window.getDefaultView());
-
         window.draw(*scoreText);
 
-        // draw game over overlay on top of frozen game
         if (isGameOver)
         {
             window.draw(*gameOver);
@@ -627,7 +599,6 @@ void Menu::draw(sf::RenderWindow& window)
             window.draw(*continueBtn);
         }
     }
-
     else if (currentScreen == Screen::CreatorsMenu)
     {
         window.draw(*creatorPage);
@@ -652,7 +623,6 @@ void Menu::draw(sf::RenderWindow& window)
         window.draw(*bigRing3);
         window.draw(*bigRing4);
         window.draw(*bigRing5);
-
         window.draw(*highScoreText);
     }
     else if (currentScreen == Screen::AboutMenu)

@@ -166,7 +166,9 @@
     <ClInclude Include="PlusShape.h" />
     <ClInclude Include="RectangleShapeObj.h" />
     <ClInclude Include="Rotation.h" />
+    <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="Shape.h" />
+    <ClInclude Include="ShapeFactory.h" />
     <ClInclude Include="StarCollectible.h" />
     <ClInclude Include="TriangleShapeObj.h" />
   </ItemGroup>

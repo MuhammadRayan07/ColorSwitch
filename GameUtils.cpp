@@ -6,9 +6,9 @@
 #include "PlusShape.h"
 #include "StarCollectible.h"
 #include"difficulty.h"
-
+#include"ShapeFactory.h"
 #include <cstdlib>
-
+#include<iostream>
 
 void resizeArray(Shape**& shapes, int& capacity)
 {
@@ -37,34 +37,39 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
     float scale = 1.0f;
     if (diff == Difficulty::Easy)   scale = 1.5f;
     else if (diff == Difficulty::Medium) scale = 1.25f;
-    else                                 scale = 1.0f;
 
     int type = rand() % 5;
 
-    if (type == 0)
-        addShape(shapes, count, capacity, new CircleShapeObj(x, y, scale));
-    else if (type == 1)
-        addShape(shapes, count, capacity, new RectangleShapeObj(x, y, scale));
-    else if (type == 2)
-        addShape(shapes, count, capacity, new TriangleShapeObj(x, y, scale));
-    else if (type == 3)
-        addShape(shapes, count, capacity, new HorizontalLine(y, width, scale));
-    else
+    try
     {
-        if (diff == Difficulty::Hard)
+        if (type == 4) // plus shape special case
         {
-            float gapX = 170.f;
-            addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 150.f * scale, -1.0f, scale));
-            addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f * scale, 1.0f, scale));
+            if (diff == Difficulty::Hard)
+            {
+                float gapX = 170.f;
+                addShape(shapes, count, capacity,
+                    new PlusShape(x - gapX / 2.f, y, 150.f * scale, -1.0f, scale));
+                addShape(shapes, count, capacity,
+                    new PlusShape(x + gapX / 2.f, y, 150.f * scale, 1.0f, scale));
+            }
+            else
+            {
+                addShape(shapes, count, capacity,
+                    new PlusShape(x, y, 150.f * scale, 1.0f, scale));
+            }
         }
         else
         {
-            
-            float shift = 50.f + static_cast<float>(rand() % 41); 
-            shift = -shift;
-
-            addShape(shapes, count, capacity, new PlusShape(x + shift, y, 150.f * scale, -1.0f, scale));
+            Shape* s = ShapeFactory::createRandom(type, x, y, width, scale, diff);
+            addShape(shapes, count, capacity, s);
         }
+    }
+    catch (const std::invalid_argument& e)
+    {
+        std::cout << "Shape spawn error: " << e.what() << "\n";
+        // fallback to circle if unknown type
+        addShape(shapes, count, capacity,
+            ShapeFactory::createShape<CircleShapeObj>(x, y, scale));
     }
 
     addShape(shapes, count, capacity, new StarCollectible(x, y));
