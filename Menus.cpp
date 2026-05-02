@@ -209,7 +209,7 @@ void Menu::startGame()
     gravity = 0.5f;
     jumpStrength = -10.f;
 
-    gameBall = new Ball(10.f, centerX, groundY);
+    gameBall = new Ball(12.f, centerX, groundY);
     gameCamera = new Camera((float)width, (float)height);
     shapeCapacity = 10;
     shapeCount = 0;
