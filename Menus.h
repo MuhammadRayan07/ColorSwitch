@@ -1,7 +1,19 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "AnimatedBall.h"
-#include "Game.h"
+#include "Ball.h"
+#include "Camera.h"
+#include "Shape.h"
+#include "CircleShapeObj.h"
+#include "RectangleShapeObj.h"
+#include "TriangleShapeObj.h"
+#include "HorizontalLine.h"
+#include "PlusShape.h"
+#include "StarCollectible.h"
+#include "GameUtils.h"
+#include "Globals.h"
+#include"Rotation.h"
+#include"Collision.h"
 enum class Screen
 {
     MainMenu,
@@ -18,13 +30,17 @@ public:
     Menu();
     ~Menu();
 
+
     void handleEvent(const sf::Event& event);
     void update(float dt, float t);
     void draw(sf::RenderWindow& window);
 
     bool shouldClose() const { return wantsClose; }
-
 private:
+    int highScore = 0;
+
+   
+    int score = 0;
     float easySpeed = 90.f;
     float mediumSpeed = 160.f;
     float hardSpeed = 240.f;
@@ -45,6 +61,12 @@ private:
     sf::Texture creatorPageTex, detailsTex;
     sf::Texture easyTex, mediumTex, hardTex;
     sf::Texture ringTex;
+    sf::Texture highScoreMenuTex;
+
+    sf::Font font;
+    sf::Text* scoreText;
+    sf::Text* highScoreText;
+        
 
     sf::Sprite* ring1;
     sf::Sprite* ring2;
@@ -61,6 +83,12 @@ private:
     sf::Sprite* about;
     sf::Sprite* creatorPage;
     sf::Sprite* details;
+    sf::Sprite* highScoreMenu;
+    sf::Sprite* bigRing;
+    sf::Sprite* bigRing2;
+    sf::Sprite* bigRing3;
+    sf::Sprite* bigRing4;
+    sf::Sprite* bigRing5;
 
     AnimatedBall leftBall;
     AnimatedBall rightBall;
@@ -74,4 +102,6 @@ private:
     bool   clicked(sf::Sprite* s, sf::Vector2f mouse);
     void startGame();
     void cleanupGame();
+    void loadHighScore();
+    void saveHighScore();
 };

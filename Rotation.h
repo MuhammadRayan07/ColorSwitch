@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
-#include "Game.h"
+#include "Shape.h"
 
 void rotateAllShapes(Shape** shapes, int count, float angle);

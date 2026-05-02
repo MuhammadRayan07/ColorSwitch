@@ -1,6 +1,7 @@
-#include "Game.h"
 #include "Collision.h"
-#include<iostream>
+#include <iostream>
+#include <cmath>
+
 bool sameColor(sf::Color a, sf::Color b)
 {
     return a.r == b.r && a.g == b.g && a.b == b.b;
@@ -61,7 +62,6 @@ bool checkWrongColorCollision(Ball& ball, Shape** shapes, int shapeCount)
 
             if (!sameColor(ball.getColor(), touchColor))
             {
-                std::cout << "Wrong collision from shape index: " << i << std::endl;
                 return true;
             }
         }
@@ -69,6 +69,7 @@ bool checkWrongColorCollision(Ball& ball, Shape** shapes, int shapeCount)
 
     return false;
 }
+
 bool checkStarCollection(Ball& ball, Shape** shapes, int shapeCount)
 {
     for (int i = 0; i < shapeCount; i++)
