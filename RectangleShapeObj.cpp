@@ -1,22 +1,23 @@
 #include "RectangleShapeObj.h"
 
-RectangleShapeObj::RectangleShapeObj(float x, float y)
+RectangleShapeObj::RectangleShapeObj(float x, float y, float scale)
 {
+    shapeScale = scale;
     posY = y;
     centerX = x;
     centerY = y;
-    halfHeight = 140.f;
+    halfHeight = 140.f * scale;
 
-    float size = 250.f;
-    float thick = 20.f;
+    float size = 250.f * scale;
+    float thick = 20.f * scale;
 
-    top.setSize({ size, thick });
-    bottom.setSize({ size, thick });
+    top.setSize({ size,  thick });
+    bottom.setSize({ size,  thick });
     left.setSize({ thick, size });
     right.setSize({ thick, size });
 
-    top.setOrigin({ size / 2.f, thick / 2.f });
-    bottom.setOrigin({ size / 2.f, thick / 2.f });
+    top.setOrigin({ size / 2.f,  thick / 2.f });
+    bottom.setOrigin({ size / 2.f,  thick / 2.f });
     left.setOrigin({ thick / 2.f, size / 2.f });
     right.setOrigin({ thick / 2.f, size / 2.f });
 
@@ -31,6 +32,7 @@ RectangleShapeObj::RectangleShapeObj(float x, float y)
     colorBottom = colors[1];
     colorLeft = colors[2];
     colorRight = colors[3];
+
     top.setFillColor(colorTop);
     bottom.setFillColor(colorBottom);
     left.setFillColor(colorLeft);
@@ -41,8 +43,8 @@ bool RectangleShapeObj::isBallTouching(sf::Vector2f ballPos, float ballRadius) c
 {
     sf::Vector2f local = rotatePointBack(ballPos, centerX, centerY, currentRotation);
 
-    float halfSize = 125.f;
-    float thick = 20.f;
+    float halfSize = 125.f * shapeScale;
+    float thick = 20.f * shapeScale;
 
     bool touchTop =
         local.y + ballRadius >= -halfSize &&

@@ -1,17 +1,18 @@
 #include "HorizontalLine.h"
 
-HorizontalLine::HorizontalLine(float y, float width)
+HorizontalLine::HorizontalLine(float y, float width, float scale)
 {
+    shapeScale = scale;
     posY = y;
     this->width = width;
     this->y = y;
-    halfHeight = 20.f;
+    halfHeight = 20.f * scale;
 
+    float thickness = 20.f * scale;
     float segmentWidth = width / 4.f;
 
     sf::Color colors[4];
     getShuffledColors(colors);
-
     for (int i = 0; i < 4; i++)
         segmentColors[i] = colors[i];
 
@@ -20,8 +21,8 @@ HorizontalLine::HorizontalLine(float y, float width)
         for (int i = 0; i < 4; i++)
         {
             int index = copy * 4 + i;
-            parts[index].setSize({ segmentWidth, 20.f });
-            parts[index].setOrigin({ segmentWidth / 2.f, 10.f });
+            parts[index].setSize({ segmentWidth, thickness });
+            parts[index].setOrigin({ segmentWidth / 2.f, thickness / 2.f });
             parts[index].setFillColor(segmentColors[i]);
         }
     }
@@ -29,8 +30,10 @@ HorizontalLine::HorizontalLine(float y, float width)
 
 bool HorizontalLine::isBallTouching(sf::Vector2f ballPos, float ballRadius) const
 {
-    return ballPos.y + ballRadius >= y - 10.f &&
-        ballPos.y - ballRadius <= y + 10.f;
+    float thickness = 10.f * shapeScale;
+
+    return ballPos.y + ballRadius >= y - thickness &&
+        ballPos.y - ballRadius <= y + thickness;
 }
 
 sf::Color HorizontalLine::getCurrentTouchColor(sf::Vector2f ballPos) const
@@ -38,10 +41,13 @@ sf::Color HorizontalLine::getCurrentTouchColor(sf::Vector2f ballPos) const
     float segmentWidth = width / 4.f;
     float adjustedX = ballPos.x - offset;
 
-    while (adjustedX < 0)     adjustedX += width;
+    while (adjustedX < 0.f)    adjustedX += width;
     while (adjustedX >= width) adjustedX -= width;
 
     int section = static_cast<int>(adjustedX / segmentWidth);
+    if (section < 0) section = 0;
+    if (section > 3) section = 3;
+
     return segmentColors[section];
 }
 
@@ -58,8 +64,8 @@ void HorizontalLine::rotateShape(float angle)
         for (int i = 0; i < 4; i++)
         {
             int index = copy * 4 + i;
-            float x = segmentWidth / 2.f + i * segmentWidth + copyOffset;
-            parts[index].setPosition({ x, y });
+            float px = segmentWidth / 2.f + i * segmentWidth + copyOffset;
+            parts[index].setPosition({ px, y });
         }
     }
 }

@@ -5,6 +5,7 @@
 #include "HorizontalLine.h"
 #include "PlusShape.h"
 #include "StarCollectible.h"
+#include"difficulty.h"
 
 #include <cstdlib>
 
@@ -32,28 +33,39 @@ void addShape(Shape**& shapes, int& count, int& capacity, Shape* newShape)
 }
 
 void spawnShape(Shape**& shapes, int& count, int& capacity,
-    float x, float y, float width)
+    float x, float y, float width, Difficulty diff)
 {
+    float scale = 1.0f;
+    if (diff == Difficulty::Easy)   scale = 1.5f;
+    else if (diff == Difficulty::Medium) scale = 1.25f;
+    else                                 scale = 1.0f;
+
     int type = rand() % 5;
 
     if (type == 0)
-        addShape(shapes, count, capacity, new CircleShapeObj(x, y));
+        addShape(shapes, count, capacity, new CircleShapeObj(x, y, scale));
     else if (type == 1)
-        addShape(shapes, count, capacity, new RectangleShapeObj(x, y));
+        addShape(shapes, count, capacity, new RectangleShapeObj(x, y, scale));
     else if (type == 2)
-        addShape(shapes, count, capacity, new TriangleShapeObj(x, y));
+        addShape(shapes, count, capacity, new TriangleShapeObj(x, y, scale));
     else if (type == 3)
-        addShape(shapes, count, capacity, new HorizontalLine(y, width));
+        addShape(shapes, count, capacity, new HorizontalLine(y, width, scale));
     else
     {
-        float gapX = 170.f;
-        addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 150.f, -1.0f));
-        addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f, 1.0f));
+        if (diff == Difficulty::Hard)
+        {
+            float gapX = 170.f;
+            addShape(shapes, count, capacity, new PlusShape(x - gapX / 2.f, y, 150.f * scale, -1.0f, scale));
+            addShape(shapes, count, capacity, new PlusShape(x + gapX / 2.f, y, 150.f * scale, 1.0f, scale));
+        }
+        else
+        {
+            addShape(shapes, count, capacity, new PlusShape(x, y, 150.f * scale, 1.0f, scale));
+        }
     }
 
     addShape(shapes, count, capacity, new StarCollectible(x, y));
 }
-
 void applyGravity(Ball& ball, float gravity)
 {
     ball.addVelocityY(gravity);

@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "MathUtils.h"
 #include <SFML/Graphics.hpp>
+
 class PlusShape : public Shape
 {
 private:
@@ -11,9 +12,10 @@ private:
     float centerX, centerY;
     float currentRotation = 0.f;
     float rotationDirection;
+    float shapeScale = 1.0f;
 
 public:
-    PlusShape(float x, float y, float size, float direction);
+    PlusShape(float x, float y, float size, float direction, float scale = 1.0f);
     void draw(sf::RenderWindow& window) override;
     void rotateShape(float angle) override;
     bool isBallTouching(sf::Vector2f ballPos, float ballRadius) const override;

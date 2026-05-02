@@ -10,9 +10,10 @@ private:
     sf::Color leftColor, rightColor, bottomColor;
     float centerX, centerY;
     float currentRotation = 0.f;
+    float shapeScale = 1.0f;
 
 public:
-    TriangleShapeObj(float x, float y);
+    TriangleShapeObj(float x, float y,float scale);
     void draw(sf::RenderWindow& window) override;
     void rotateShape(float angle) override;
     bool isBallTouching(sf::Vector2f ballPos, float ballRadius) const override;

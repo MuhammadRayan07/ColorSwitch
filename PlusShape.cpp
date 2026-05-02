@@ -1,14 +1,15 @@
 #include "PlusShape.h"
 
-PlusShape::PlusShape(float x, float y, float size, float direction)
+PlusShape::PlusShape(float x, float y, float size, float direction, float scale)
 {
+    shapeScale = scale;
     posY = y;
-    halfHeight = 90.f;
+    halfHeight = 90.f * scale;
     centerX = x;
     centerY = y;
     rotationDirection = direction;
 
-    float thickness = 20.f;
+    float thickness = 20.f * scale;
     float half = size / 2.f;
 
     sf::Color colors[4];
@@ -43,8 +44,8 @@ bool PlusShape::isBallTouching(sf::Vector2f ballPos, float ballRadius) const
 {
     sf::Vector2f local = rotatePointBack(ballPos, centerX, centerY, currentRotation);
 
-    float armLength = 90.f;
-    float thick = 20.f;
+    float armLength = 90.f * shapeScale;
+    float thick = 20.f * shapeScale;
 
     bool horizontal =
         local.x + ballRadius >= -armLength &&

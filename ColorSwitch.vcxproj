@@ -140,6 +140,7 @@
     <ClCompile Include="Camera.h" />
     <ClCompile Include="CircleShapeObj.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="difficulty.h" />
     <ClCompile Include="GameUtils.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="HorizontalLine.cpp" />

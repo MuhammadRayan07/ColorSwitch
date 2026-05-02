@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "MathUtils.h"
 #include <SFML/Graphics.hpp>
+
 class CircleShapeObj : public Shape
 {
 private:
@@ -11,9 +12,10 @@ private:
     sf::Color sectionColors[4];
     float centerX, centerY;
     float currentRotation = 0.f;
+    float shapeScale = 1.0f;
 
 public:
-    CircleShapeObj(float x, float y);
+    CircleShapeObj(float x, float y, float scale = 1.0f);
     void draw(sf::RenderWindow& window) override;
     void rotateShape(float angle) override;
     bool isBallTouching(sf::Vector2f ballPos, float ballRadius) const override;

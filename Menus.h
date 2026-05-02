@@ -12,8 +12,9 @@
 #include "StarCollectible.h"
 #include "GameUtils.h"
 #include "Globals.h"
-#include"Rotation.h"
-#include"Collision.h"
+#include "Rotation.h"
+#include "Collision.h"
+#include"difficulty.h"
 enum class Screen
 {
     MainMenu,
@@ -29,31 +30,30 @@ class Menu
 public:
     Menu();
     ~Menu();
-
-
     void handleEvent(const sf::Event& event);
     void update(float dt, float t);
     void draw(sf::RenderWindow& window);
-
     bool shouldClose() const { return wantsClose; }
+
 private:
     int highScore = 0;
-
-   
     int score = 0;
     float easySpeed = 90.f;
     float mediumSpeed = 160.f;
     float hardSpeed = 240.f;
     float currentTime;
-    //Game.h members
+
+    // game members
     Ball* gameBall;
     Camera* gameCamera;
     Shape** shapes;
-    int      shapeCount;
-    int      shapeCapacity;
-    float    lastSpawnY;
-    float    gravity;
-    float    jumpStrength;
+    int        shapeCount;
+    int        shapeCapacity;
+    float      lastSpawnY;
+    float      rotationSpeed;
+    float      gravity;
+    float      jumpStrength;
+    Difficulty currentDifficulty;
 
     sf::Texture logoTex, playTex, starTex, plusTex;
     sf::Texture creatorsTex, highTex, aboutTex;
@@ -61,11 +61,9 @@ private:
     sf::Texture easyTex, mediumTex, hardTex;
     sf::Texture ringTex;
     sf::Texture highScoreMenuTex;
-
-    sf::Font font;
+    sf::Font    font;
     sf::Text* scoreText;
     sf::Text* highScoreText;
-        
 
     sf::Sprite* ring1;
     sf::Sprite* ring2;
@@ -91,15 +89,15 @@ private:
 
     AnimatedBall leftBall;
     AnimatedBall rightBall;
-    AnimatedBall leftBall2;   
+    AnimatedBall leftBall2;
     AnimatedBall rightBall2;
 
     Screen currentScreen;
     bool   wantsClose;
 
-    void   centerOrigin(sf::Sprite* s);
-    bool   clicked(sf::Sprite* s, sf::Vector2f mouse);
-    void startGame();
+    void centerOrigin(sf::Sprite* s);
+    bool clicked(sf::Sprite* s, sf::Vector2f mouse);
+    void startGame(Difficulty diff);
     void cleanupGame();
     void loadHighScore();
     void saveHighScore();

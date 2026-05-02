@@ -12,9 +12,10 @@ private:
     float speed = 2.5f;
     float width;
     float y;
+    float shapeScale = 1.0f;
 
 public:
-    HorizontalLine(float y, float width);
+    HorizontalLine(float y, float width, float scale = 1.0f);
     void draw(sf::RenderWindow& window) override;
     void rotateShape(float angle) override;
     bool isBallTouching(sf::Vector2f ballPos, float ballRadius) const override;

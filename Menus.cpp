@@ -20,6 +20,8 @@ Menu::Menu()
     , lastSpawnY(0.f)
     , gravity(0.f)
     , jumpStrength(0.f)
+    , rotationSpeed(1.0f)
+    , currentDifficulty(Difficulty::Hard)
 {
     loadHighScore();
     if (!logoTex.loadFromFile("ColorSwitchSprites/Colorswitch.png") ||
@@ -194,7 +196,7 @@ Menu::~Menu()
     delete highScoreText;
     cleanupGame();
 }
-void Menu::startGame()
+void Menu::startGame(Difficulty diff)
 {
     score = 0;
     cleanupGame();
@@ -206,10 +208,29 @@ void Menu::startGame()
     const float centerX = width / 2.f;
     const float baseY = 100.f;
 
-    gravity = 0.5f;
-    jumpStrength = -10.f;
+    if (diff == Difficulty::Easy)
+    {
+        gravity = 0.5f;
+        jumpStrength = -10.f;
+        rotationSpeed = 0.4f;
+    }
+    else if (diff == Difficulty::Medium)
+    {
+        gravity = 0.5f;
+        jumpStrength = -10.f;
+        rotationSpeed = 0.7f;
+    }
+    else // Hard
+    {
+        gravity = 0.5f;
+        jumpStrength = -10.f;
+        rotationSpeed = 1.0f;
+    }
 
-    gameBall = new Ball(12.f, centerX, groundY);
+    // store difficulty for spawnShape
+    currentDifficulty = diff;
+
+    gameBall = new Ball(10.f, centerX, groundY);
     gameCamera = new Camera((float)width, (float)height);
     shapeCapacity = 10;
     shapeCount = 0;
@@ -218,7 +239,7 @@ void Menu::startGame()
 
     for (int i = 0; i < 5; i++)
     {
-        spawnShape(shapes, shapeCount, shapeCapacity, centerX, lastSpawnY, width);
+        spawnShape(shapes, shapeCount, shapeCapacity, centerX, lastSpawnY, width, diff);
         lastSpawnY -= gap;
     }
 }
@@ -303,9 +324,9 @@ void Menu::handleEvent(const sf::Event& event)
             }
             else if (currentScreen == Screen::PlayMenu)
             {
-                if (clicked(easyMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
-                else if (clicked(mediumMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
-                else if (clicked(hardMenu, mousePos)) { startGame(); currentScreen = Screen::GameScreen; }
+                if (clicked(easyMenu, mousePos)) { startGame(Difficulty::Easy);   currentScreen = Screen::GameScreen; }
+                else if (clicked(mediumMenu, mousePos)) { startGame(Difficulty::Medium); currentScreen = Screen::GameScreen; }
+                else if (clicked(hardMenu, mousePos)) { startGame(Difficulty::Hard);   currentScreen = Screen::GameScreen; }
             }
         }
     }
@@ -342,7 +363,7 @@ void Menu::update(float dt, float t)
         moveBall(*gameBall);
         resetBallOnGround(*gameBall, 880.f);
         updateCamera(*gameCamera, *gameBall, width, height);
-        rotateAllShapes(shapes, shapeCount, 1.0f);
+        rotateAllShapes(shapes, shapeCount, rotationSpeed);
 
         if (checkStarCollection(*gameBall, shapes, shapeCount))
         {
@@ -373,8 +394,7 @@ void Menu::update(float dt, float t)
 
         if (gameBall->getPosition().y < lastSpawnY + gap)
         {
-            spawnShape(shapes, shapeCount, shapeCapacity,
-                width / 2.f, lastSpawnY, width);
+            spawnShape(shapes, shapeCount, shapeCapacity, width / 2.f, lastSpawnY, width, currentDifficulty);
             lastSpawnY -= gap;
         }
         while (shapeCount > 0 &&

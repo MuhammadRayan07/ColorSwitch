@@ -2,10 +2,11 @@
 #include "Shape.h"
 #include "Ball.h"
 #include "Camera.h"
+#include "Difficulty.h"
 
 void resizeArray(Shape**& shapes, int& capacity);
 void addShape(Shape**& shapes, int& count, int& capacity, Shape* newShape);
-void spawnShape(Shape**& shapes, int& count, int& capacity, float x, float y, float width);
+void spawnShape(Shape**& shapes, int& count, int& capacity, float x, float y, float width, Difficulty diff);
 void removeFirst(Shape**& shapes, int& count);
 
 void applyGravity(Ball& ball, float gravity);

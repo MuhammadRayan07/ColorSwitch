@@ -1,8 +1,8 @@
 #include "TriangleShapeObj.h"
 
-TriangleShapeObj::TriangleShapeObj(float x, float y)
+TriangleShapeObj::TriangleShapeObj(float x, float y,float scale)
 {
-    float scale = 1.5f;
+
     posY = y;
     centerX = x;
     centerY = y;
@@ -12,6 +12,7 @@ TriangleShapeObj::TriangleShapeObj(float x, float y)
     float sideLength = base + 5.f * scale;
     float baseY = y + 80.f * scale;
     halfHeight = 150.f * scale;
+    shapeScale = scale;
 
     sf::Color colors[4];
     getShuffledColors(colors);
@@ -49,29 +50,29 @@ static const float APEX_Y_LOC = BASE_Y_LOC - SIDE_LEN * 0.86602540378f; // ? ?22
 bool TriangleShapeObj::isBallTouching(sf::Vector2f ballPos, float ballRadius) const
 {
     sf::Vector2f local = rotatePointBack(ballPos, centerX, centerY, currentRotation);
-    // Shift to the triangle's local coordinate frame (center is at 0,0 after rotatePointBack)
-    float lx = local.x - centerX;   // if rotatePointBack already subtracts center, remove this
-    float ly = local.y - centerY;
 
-    // --- Bottom bar ---
+    float baseY = 80.f * shapeScale;
+    float thickness = 20.f * shapeScale;
+    float halfBase = 130.f * shapeScale;
+    float apexY = baseY - (265.f * shapeScale) * 0.86602540378f;
+
     bool touchBottom =
-        ly + ballRadius >= BASE_Y_LOC - THICKNESS / 2.f &&
-        ly - ballRadius <= BASE_Y_LOC + THICKNESS / 2.f &&
-        lx >= -HALF_BASE - ballRadius && lx <= HALF_BASE + ballRadius;
+        local.y + ballRadius >= baseY - thickness / 2.f &&
+        local.y - ballRadius <= baseY + thickness / 2.f &&
+        local.x >= -halfBase - ballRadius && local.x <= halfBase + ballRadius;
 
-    // --- Left side: runs from (-HALF_BASE, BASE_Y_LOC) up to (0, APEX_Y_LOC) ---
-    // At a given ly, the center-line X of the left bar:
-    float t = (ly - BASE_Y_LOC) / (APEX_Y_LOC - BASE_Y_LOC); // 0 at base, 1 at apex
-    float leftCenterX = -HALF_BASE + t * HALF_BASE;          // ?195 ? 0
-    float rightCenterX = HALF_BASE - t * HALF_BASE;          //  195 ? 0
+    float t = (local.y - baseY) / (apexY - baseY);
+    t = std::max(0.f, std::min(1.f, t));
+    float leftCenterX = -halfBase + t * halfBase;
+    float rightCenterX = halfBase - t * halfBase;
 
     bool touchLeft =
-        ly >= APEX_Y_LOC - ballRadius && ly <= BASE_Y_LOC + ballRadius &&
-        std::abs(lx - leftCenterX) <= THICKNESS / 2.f + ballRadius;
+        local.y >= apexY - ballRadius && local.y <= baseY + ballRadius &&
+        std::abs(local.x - leftCenterX) <= thickness / 2.f + ballRadius;
 
     bool touchRight =
-        ly >= APEX_Y_LOC - ballRadius && ly <= BASE_Y_LOC + ballRadius &&
-        std::abs(lx - rightCenterX) <= THICKNESS / 2.f + ballRadius;
+        local.y >= apexY - ballRadius && local.y <= baseY + ballRadius &&
+        std::abs(local.x - rightCenterX) <= thickness / 2.f + ballRadius;
 
     return touchBottom || touchLeft || touchRight;
 }
@@ -79,25 +80,22 @@ bool TriangleShapeObj::isBallTouching(sf::Vector2f ballPos, float ballRadius) co
 sf::Color TriangleShapeObj::getCurrentTouchColor(sf::Vector2f ballPos) const
 {
     sf::Vector2f local = rotatePointBack(ballPos, centerX, centerY, currentRotation);
-    float lx = local.x - centerX;
-    float ly = local.y - centerY;
 
-    if (ly >= BASE_Y_LOC - THICKNESS)
+    float baseY = 80.f * shapeScale;
+    float thickness = 20.f * shapeScale;
+    float halfBase = 130.f * shapeScale;
+    float apexY = baseY - (265.f * shapeScale) * 0.86602540378f;
+
+    if (local.y >= baseY - thickness)
         return bottomColor;
 
-    float t = (ly - BASE_Y_LOC) / (APEX_Y_LOC - BASE_Y_LOC);
-    float leftCenterX = -HALF_BASE + t * HALF_BASE;
-    float rightCenterX = HALF_BASE - t * HALF_BASE;
+    float t = (local.y - baseY) / (apexY - baseY);
+    t = std::max(0.f, std::min(1.f, t));
+    float leftCenterX = -halfBase + t * halfBase;
+    float rightCenterX = halfBase - t * halfBase;
 
-    if (std::abs(lx - leftCenterX) < std::abs(lx - rightCenterX))
+    if (std::abs(local.x - leftCenterX) < std::abs(local.x - rightCenterX))
         return leftColor;
-    return rightColor;
-}
-sf::Color TriangleShapeObj::getRandomAllowedColor() const
-{
-    int r = rand() % 3;
-    if (r == 0) return bottomColor;
-    if (r == 1) return leftColor;
     return rightColor;
 }
 
@@ -116,4 +114,11 @@ void TriangleShapeObj::draw(sf::RenderWindow& window)
     window.draw(left, states);
     window.draw(right, states);
     window.draw(bottom, states);
+}
+sf::Color TriangleShapeObj::getRandomAllowedColor() const
+{
+    int r = rand() % 3;
+    if (r == 0) return bottomColor;
+    if (r == 1) return leftColor;
+    return rightColor;
 }
