@@ -38,14 +38,8 @@ TriangleShapeObj::TriangleShapeObj(float x, float y,float scale)
     right.setFillColor(rightColor);
 }
 
-// Replace the static constexpr block with these:
-static const float SCALE = 1.5f;
-static const float HALF_BASE = 130.f * 1.5f;          // 195.0
-static const float THICKNESS = 20.f * 1.5f;          // 30.0
-static const float BASE_Y_LOC = 80.f * 1.5f;          // 120.0
-static const float SIDE_LEN = 265.f * 1.5f;          // 397.5
-// sin(60°) = 0.86602540378f  — pre-computed, no runtime call needed
-static const float APEX_Y_LOC = BASE_Y_LOC - SIDE_LEN * 0.86602540378f; // ? ?224.3
+
+
 
 bool TriangleShapeObj::isBallTouching(sf::Vector2f ballPos, float ballRadius) const
 {

@@ -37,7 +37,10 @@ Menu::Menu()
         !mediumTex.loadFromFile("ColorSwitchSprites/Mediummenu.png") ||
         !hardTex.loadFromFile("ColorSwitchSprites/Hardmenu.png")||
         !ringTex.loadFromFile("ColorSwitchSprites/Ring.png")||
-        !highScoreMenuTex.loadFromFile("ColorSwitchSprites/Hs.png"))
+        !highScoreMenuTex.loadFromFile("ColorSwitchSprites/Hs.png")||
+        !gameOverTex.loadFromFile("ColorSwitchSprites/GameOver.png") ||
+        !homeTex.loadFromFile("ColorSwitchSprites/Home.png") ||
+        !continueTex.loadFromFile("ColorSwitchSprites/Continue.png"))
     {
         std::cout << "Failed loading textures\n";
     }
@@ -57,7 +60,7 @@ Menu::Menu()
     highScoreText->setFont(font);
     highScoreText->setCharacterSize(150);
     highScoreText->setFillColor(sf::Color::Magenta);
-    highScoreText->setPosition({ 360.f, 490.f }); // adjust for menu
+    highScoreText->setPosition({ 330.f, 490.f }); // adjust for menu
     logo = new sf::Sprite(logoTex);
     play = new sf::Sprite(playTex);
     star = new sf::Sprite(starTex);
@@ -79,12 +82,19 @@ Menu::Menu()
     bigRing3 = new sf::Sprite(ringTex);
     bigRing4 = new sf::Sprite(ringTex);
     bigRing5 = new sf::Sprite(ringTex);
+    gameOver = new sf::Sprite(gameOverTex);
+    homeBtn = new sf::Sprite(homeTex);
+    continueBtn = new sf::Sprite(continueTex);
+
     centerOrigin(highScoreMenu);
     centerOrigin(bigRing);
     centerOrigin(bigRing2);
     centerOrigin(bigRing3);
     centerOrigin(bigRing4);
     centerOrigin(bigRing5);
+    centerOrigin(gameOver);
+    centerOrigin(homeBtn);
+    centerOrigin(continueBtn);
 
     centerOrigin(ring1);
     centerOrigin(ring2);
@@ -123,6 +133,9 @@ Menu::Menu()
     bigRing3->setScale({ 0.7f, 0.7f }); 
     bigRing4->setScale({ 0.7f, 0.7f }); 
     bigRing5->setScale({ 0.7f, 0.7f });
+    gameOver->setScale({ 0.50f, 0.50f });
+    homeBtn->setScale({ 0.47f, 0.47f });
+    continueBtn->setScale({ 0.47f, 0.47f });
 
     logo->setPosition({ 400.f, 150.f });
     play->setPosition({ 400.f, 450.f });
@@ -141,6 +154,9 @@ Menu::Menu()
     bigRing3->setPosition({ 830.f, 429.f });
     bigRing4->setPosition({ 60.f, 905.f });
     bigRing5->setPosition({ 738.f, 880.f });
+    gameOver->setPosition({ 400.f, 450.f });
+    homeBtn->setPosition({ 483.f, 520.f });
+    continueBtn->setPosition({ 320.f, 520.f });
 }
 //filehandling
 void Menu::loadHighScore() 
@@ -194,10 +210,15 @@ Menu::~Menu()
     delete bigRing5;
     delete scoreText;
     delete highScoreText;
+    delete gameOver;
+    delete homeBtn;
+    delete continueBtn;
     cleanupGame();
 }
 void Menu::startGame(Difficulty diff)
 {
+    isGameOver = false;
+    ballHasLaunched = false;
     score = 0;
     cleanupGame();
 
@@ -286,7 +307,10 @@ void Menu::handleEvent(const sf::Event& event)
         if (key->scancode == sf::Keyboard::Scancode::Escape)
         {
             if (currentScreen != Screen::MainMenu)
+            {
+                isGameOver = false;  
                 currentScreen = Screen::MainMenu;
+            }
             else
                 wantsClose = true;
         }
@@ -328,6 +352,20 @@ void Menu::handleEvent(const sf::Event& event)
                 else if (clicked(mediumMenu, mousePos)) { startGame(Difficulty::Medium); currentScreen = Screen::GameScreen; }
                 else if (clicked(hardMenu, mousePos)) { startGame(Difficulty::Hard);   currentScreen = Screen::GameScreen; }
             }
+            else if (currentScreen == Screen::GameScreen && isGameOver)
+            {
+                if (clicked(homeBtn, mousePos))
+                {
+                    isGameOver = false;
+                    currentScreen = Screen::MainMenu;
+                }
+                else if (clicked(continueBtn, mousePos))
+                {
+                    isGameOver = false;
+                    startGame(currentDifficulty);
+                    currentScreen = Screen::GameScreen;
+                }
+            }
         }
     }
 }
@@ -353,7 +391,7 @@ void Menu::update(float dt, float t)
     scoreText->setString("Score: " + std::to_string(score));
     highScoreText->setString(  std::to_string(highScore));
     
-    if (currentScreen == Screen::GameScreen && gameBall && gameCamera)
+    if (currentScreen == Screen::GameScreen && gameBall && gameCamera&&!isGameOver)
     {
         const int width = 800;
         const int height = 900;
@@ -362,6 +400,18 @@ void Menu::update(float dt, float t)
         applyGravity(*gameBall, gravity);
         moveBall(*gameBall);
         resetBallOnGround(*gameBall, 880.f);
+        // track when ball first jumps
+        if (gameBall->getVelocityY() < 0.f)
+            ballHasLaunched = true;
+        if (ballHasLaunched && gameBall->getPosition().y >= 880.f && !isGameOver)
+        {
+            if (score > highScore)
+            {
+                highScore = score;
+                saveHighScore();
+            }
+            isGameOver = true;
+        }
         updateCamera(*gameCamera, *gameBall, width, height);
         rotateAllShapes(shapes, shapeCount, rotationSpeed);
 
@@ -382,14 +432,14 @@ void Menu::update(float dt, float t)
 
         checkShapePassCollision(*gameBall, shapes, shapeCount);
 
-        if (checkWrongColorCollision(*gameBall, shapes, shapeCount))
+        if (!isGameOver && checkWrongColorCollision(*gameBall, shapes, shapeCount))
         {
             if (score > highScore)
             {
                 highScore = score;
                 saveHighScore();
             }
-            currentScreen = Screen::MainMenu;
+            isGameOver = true;
         }
 
         if (gameBall->getPosition().y < lastSpawnY + gap)
@@ -461,7 +511,6 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::GameScreen)
     {
-        // 🎮 Game world (camera view)
         window.setView(gameCamera->getView());
 
         for (int i = 0; i < shapeCount; i++)
@@ -473,12 +522,19 @@ void Menu::draw(sf::RenderWindow& window)
 
         gameBall->draw(window);
 
-        // 🧾 UI (fixed screen view)
         window.setView(window.getDefaultView());
 
-        window.draw(*scoreText);   // ✅ ADD HERE
+        window.draw(*scoreText);
+
+        // draw game over overlay on top of frozen game
+        if (isGameOver)
+        {
+            window.draw(*gameOver);
+            window.draw(*homeBtn);
+            window.draw(*continueBtn);
+        }
     }
-   
+
     else if (currentScreen == Screen::CreatorsMenu)
     {
         window.draw(*creatorPage);

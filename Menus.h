@@ -22,7 +22,7 @@ enum class Screen
     CreatorsMenu,
     HighscoreMenu,
     AboutMenu,
-    GameScreen
+    GameScreen,
 };
 
 class Menu
@@ -42,6 +42,8 @@ private:
     float mediumSpeed = 160.f;
     float hardSpeed = 240.f;
     float currentTime;
+    bool isGameOver = false;
+    bool ballHasLaunched = false;
 
     // game members
     Ball* gameBall;
@@ -61,9 +63,12 @@ private:
     sf::Texture easyTex, mediumTex, hardTex;
     sf::Texture ringTex;
     sf::Texture highScoreMenuTex;
+    sf::Texture gameOverTex, homeTex, continueTex;
+
     sf::Font    font;
     sf::Text* scoreText;
     sf::Text* highScoreText;
+
 
     sf::Sprite* ring1;
     sf::Sprite* ring2;
@@ -86,6 +91,9 @@ private:
     sf::Sprite* bigRing3;
     sf::Sprite* bigRing4;
     sf::Sprite* bigRing5;
+    sf::Sprite* gameOver;
+    sf::Sprite* homeBtn;
+    sf::Sprite* continueBtn;
 
     AnimatedBall leftBall;
     AnimatedBall rightBall;

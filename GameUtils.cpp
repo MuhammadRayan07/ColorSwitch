@@ -9,7 +9,6 @@
 
 #include <cstdlib>
 
-// ================= EXISTING =================
 
 void resizeArray(Shape**& shapes, int& capacity)
 {
@@ -60,7 +59,11 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
         }
         else
         {
-            addShape(shapes, count, capacity, new PlusShape(x, y, 150.f * scale, 1.0f, scale));
+            
+            float shift = 50.f + static_cast<float>(rand() % 41); 
+            shift = -shift;
+
+            addShape(shapes, count, capacity, new PlusShape(x + shift, y, 150.f * scale, -1.0f, scale));
         }
     }
 

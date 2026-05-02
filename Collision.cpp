@@ -26,7 +26,7 @@ void checkShapePassCollision(Ball& ball, Shape** shapes, int shapeCount)
         {
             int next = i + 1;
             while (next < shapeCount &&
-                (!shapes[next] || !shapes[next]->isObstacle()))
+                (!shapes[next] || !shapes[next]->isObstacle() || shapes[next]->isPassed()))
                 next++;
 
             if (next < shapeCount)
@@ -45,7 +45,9 @@ bool checkWrongColorCollision(Ball& ball, Shape** shapes, int shapeCount)
     {
         if (!shapes[i] || shapes[i]->isCollected() || !shapes[i]->isObstacle())
             continue;
-
+        if (!shapes[i] || shapes[i]->isCollected() ||
+            !shapes[i]->isObstacle() || shapes[i]->isPassed())
+            continue;
         if (shapes[i]->isBallTouching(ball.getPosition(), ball.getRadius()))
         {
             sf::Color touchColor =
@@ -57,6 +59,7 @@ bool checkWrongColorCollision(Ball& ball, Shape** shapes, int shapeCount)
                 return true;
             }
         }
+
     }
     return false;
 }
