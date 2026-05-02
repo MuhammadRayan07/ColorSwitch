@@ -37,6 +37,7 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
     float scale = 1.0f;
     if (diff == Difficulty::Easy)   scale = 1.5f;
     else if (diff == Difficulty::Medium) scale = 1.25f;
+    else                                 scale = 1.0f;
 
     int type = rand() % 5;
 
@@ -54,8 +55,10 @@ void spawnShape(Shape**& shapes, int& count, int& capacity,
             }
             else
             {
+                float shift = 50.f + static_cast<float>(rand() % 41);
+                shift = -shift;
                 addShape(shapes, count, capacity,
-                    new PlusShape(x, y, 150.f * scale, 1.0f, scale));
+                    new PlusShape(x + shift, y, 150.f * scale, -1.0f, scale));
             }
         }
         else
