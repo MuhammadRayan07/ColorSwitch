@@ -257,19 +257,19 @@ void Menu::startGame(Difficulty diff)
     {
         gravity = 0.5f;
         jumpStrength = -10.f;
-        rotationSpeed = 0.4f;
+        rotationSpeed = 0.7f;
     }
     else if (diff == Difficulty::Medium)
     {
         gravity = 0.5f;
         jumpStrength = -10.f;
-        rotationSpeed = 0.7f;
+        rotationSpeed = 1.0f;
     }
     else // Hard
     {
         gravity = 0.5f;
         jumpStrength = -10.f;
-        rotationSpeed = 1.0f;
+        rotationSpeed = 1.5f;
     }
 
     // store difficulty for spawnShape
