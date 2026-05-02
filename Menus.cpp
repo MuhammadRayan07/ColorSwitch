@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Rotation.h"
 #include "Collision.h"
+#include <fstream>
 bool spacePressed = false;
 Menu::Menu()
     : leftBall(180.f, sf::Color(255, 0, 180))
@@ -20,7 +21,7 @@ Menu::Menu()
     , gravity(0.f)
     , jumpStrength(0.f)
 {
-  
+    loadHighScore();
     if (!logoTex.loadFromFile("ColorSwitchSprites/Colorswitch.png") ||
         !playTex.loadFromFile("ColorSwitchSprites/Play.png") ||
         !starTex.loadFromFile("ColorSwitchSprites/Star.png") ||
@@ -38,6 +39,23 @@ Menu::Menu()
     {
         std::cout << "Failed loading textures\n";
     }
+    if (!font.openFromFile("ColorSwitchSprites/arial.ttf"))
+    {
+        std::cout << "Font not loaded\n";
+    }
+
+    scoreText = new sf::Text(font);
+    highScoreText = new sf::Text(font);
+
+    scoreText->setFont(font);
+    scoreText->setCharacterSize(30);
+    scoreText->setFillColor(sf::Color::White);
+    scoreText->setPosition({ 10.f, 10.f });
+
+    highScoreText->setFont(font);
+    highScoreText->setCharacterSize(150);
+    highScoreText->setFillColor(sf::Color::Magenta);
+    highScoreText->setPosition({ 360.f, 490.f }); // adjust for menu
     logo = new sf::Sprite(logoTex);
     play = new sf::Sprite(playTex);
     star = new sf::Sprite(starTex);
@@ -122,6 +140,32 @@ Menu::Menu()
     bigRing4->setPosition({ 60.f, 905.f });
     bigRing5->setPosition({ 738.f, 880.f });
 }
+//filehandling
+void Menu::loadHighScore() 
+{
+    std::ifstream file("highscore.txt");
+
+    if (file.is_open())
+    {
+        file >> highScore;
+        file.close();
+    }
+    else
+    {
+        highScore = 0; // first time run
+    }
+}
+
+void Menu::saveHighScore()
+{
+    std::ofstream file("highscore.txt");
+
+    if (file.is_open())
+    {
+        file << highScore;
+        file.close();
+    }
+}
 
 Menu::~Menu()
 {
@@ -146,6 +190,8 @@ Menu::~Menu()
     delete bigRing3;
     delete bigRing4;
     delete bigRing5;
+    delete scoreText;
+    delete highScoreText;
     cleanupGame();
 }
 void Menu::startGame()
@@ -281,7 +327,11 @@ void Menu::update(float dt, float t)
     ring1->setRotation(sf::degrees(t * easySpeed));    
     ring2->setRotation(sf::degrees(-(t * easySpeed)));
 
-    bigRing->setRotation(sf::degrees(currentTime * 30.f));  
+    bigRing->setRotation(sf::degrees(currentTime * 30.f)); 
+
+    scoreText->setString("Score: " + std::to_string(score));
+    highScoreText->setString(  std::to_string(highScore));
+    
     if (currentScreen == Screen::GameScreen && gameBall && gameCamera)
     {
         const int width = 800;
@@ -297,13 +347,29 @@ void Menu::update(float dt, float t)
         if (checkStarCollection(*gameBall, shapes, shapeCount))
         {
             score++;
+
+            if (score > highScore)
+            {
+                highScore = score;
+                saveHighScore();
+            }
+
             std::cout << "Score: " << score << "\n";
         }
+
+        
 
         checkShapePassCollision(*gameBall, shapes, shapeCount);
 
         if (checkWrongColorCollision(*gameBall, shapes, shapeCount))
+        {
+            if (score > highScore)
+            {
+                highScore = score;
+                saveHighScore();
+            }
             currentScreen = Screen::MainMenu;
+        }
 
         if (gameBall->getPosition().y < lastSpawnY + gap)
         {
@@ -375,6 +441,7 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::GameScreen)
     {
+        // 🎮 Game world (camera view)
         window.setView(gameCamera->getView());
 
         for (int i = 0; i < shapeCount; i++)
@@ -386,9 +453,12 @@ void Menu::draw(sf::RenderWindow& window)
 
         gameBall->draw(window);
 
+        // 🧾 UI (fixed screen view)
         window.setView(window.getDefaultView());
-      
+
+        window.draw(*scoreText);   // ✅ ADD HERE
     }
+   
     else if (currentScreen == Screen::CreatorsMenu)
     {
         window.draw(*creatorPage);
@@ -413,6 +483,8 @@ void Menu::draw(sf::RenderWindow& window)
         window.draw(*bigRing3);
         window.draw(*bigRing4);
         window.draw(*bigRing5);
+
+        window.draw(*highScoreText);
     }
     else if (currentScreen == Screen::AboutMenu)
     {

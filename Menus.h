@@ -30,13 +30,16 @@ public:
     Menu();
     ~Menu();
 
+
     void handleEvent(const sf::Event& event);
     void update(float dt, float t);
     void draw(sf::RenderWindow& window);
 
     bool shouldClose() const { return wantsClose; }
-
 private:
+    int highScore = 0;
+
+   
     int score = 0;
     float easySpeed = 90.f;
     float mediumSpeed = 160.f;
@@ -58,6 +61,10 @@ private:
     sf::Texture easyTex, mediumTex, hardTex;
     sf::Texture ringTex;
     sf::Texture highScoreMenuTex;
+
+    sf::Font font;
+    sf::Text* scoreText;
+    sf::Text* highScoreText;
         
 
     sf::Sprite* ring1;
@@ -94,4 +101,6 @@ private:
     bool   clicked(sf::Sprite* s, sf::Vector2f mouse);
     void startGame();
     void cleanupGame();
+    void loadHighScore();
+    void saveHighScore();
 };
