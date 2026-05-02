@@ -135,15 +135,42 @@
   <ItemGroup>
     <ClCompile Include="AnimatedBall.cpp" />
     <ClCompile Include="Assets.cpp" />
-    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Camera.h" />
+    <ClCompile Include="CircleShapeObj.cpp" />
+    <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="GameUtils.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="HorizontalLine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menus.cpp" />
-    <ClCompile Include="Game.h" />
+    <ClCompile Include="PlusShape.cpp" />
+    <ClCompile Include="RectangleShapeObj.cpp" />
+    <ClCompile Include="Rotation.cpp" />
+    <ClCompile Include="StarCollectible.cpp" />
+    <ClCompile Include="TriangleShapeObj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedBall.h" />
     <ClInclude Include="Assets.h" />
+    <ClInclude Include="Ball.h" />
+    <ClInclude Include="CircleShapeObj.h" />
+    <ClInclude Include="Collision.h" />
+    <ClInclude Include="GameUtils.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="HorizontalLine.h" />
+    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Menus.h" />
+    <ClInclude Include="PlusShape.h" />
+    <ClInclude Include="RectangleShapeObj.h" />
+    <ClInclude Include="Rotation.h" />
+    <ClInclude Include="Shape.h" />
+    <ClInclude Include="StarCollectible.h" />
+    <ClInclude Include="TriangleShapeObj.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="highscore.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

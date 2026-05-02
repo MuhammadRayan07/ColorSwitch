@@ -1,7 +1,10 @@
 #include "Menus.h"
 #include <iostream>
 #include <cmath>
-
+#include "Rotation.h"
+#include "Collision.h"
+#include <fstream>
+bool spacePressed = false;
 Menu::Menu()
     : leftBall(180.f, sf::Color(255, 0, 180))
     , rightBall(630.f, sf::Color(0, 220, 255))
@@ -18,7 +21,7 @@ Menu::Menu()
     , gravity(0.f)
     , jumpStrength(0.f)
 {
-  
+    loadHighScore();
     if (!logoTex.loadFromFile("ColorSwitchSprites/Colorswitch.png") ||
         !playTex.loadFromFile("ColorSwitchSprites/Play.png") ||
         !starTex.loadFromFile("ColorSwitchSprites/Star.png") ||
@@ -31,10 +34,28 @@ Menu::Menu()
         !easyTex.loadFromFile("ColorSwitchSprites/Easymenu.png") ||
         !mediumTex.loadFromFile("ColorSwitchSprites/Mediummenu.png") ||
         !hardTex.loadFromFile("ColorSwitchSprites/Hardmenu.png")||
-        !ringTex.loadFromFile("ColorSwitchSprites/Ring.png"))
+        !ringTex.loadFromFile("ColorSwitchSprites/Ring.png")||
+        !highScoreMenuTex.loadFromFile("ColorSwitchSprites/Hs.png"))
     {
         std::cout << "Failed loading textures\n";
     }
+    if (!font.openFromFile("ColorSwitchSprites/arial.ttf"))
+    {
+        std::cout << "Font not loaded\n";
+    }
+
+    scoreText = new sf::Text(font);
+    highScoreText = new sf::Text(font);
+
+    scoreText->setFont(font);
+    scoreText->setCharacterSize(30);
+    scoreText->setFillColor(sf::Color::White);
+    scoreText->setPosition({ 10.f, 10.f });
+
+    highScoreText->setFont(font);
+    highScoreText->setCharacterSize(150);
+    highScoreText->setFillColor(sf::Color::Magenta);
+    highScoreText->setPosition({ 360.f, 490.f }); // adjust for menu
     logo = new sf::Sprite(logoTex);
     play = new sf::Sprite(playTex);
     star = new sf::Sprite(starTex);
@@ -50,6 +71,18 @@ Menu::Menu()
     hardMenu = new sf::Sprite(hardTex);
     ring1 = new sf::Sprite(ringTex);
     ring2 = new sf::Sprite(ringTex);
+    highScoreMenu = new sf::Sprite(highScoreMenuTex);
+    bigRing = new sf::Sprite(ringTex);   
+    bigRing2 = new sf::Sprite(ringTex);
+    bigRing3 = new sf::Sprite(ringTex);
+    bigRing4 = new sf::Sprite(ringTex);
+    bigRing5 = new sf::Sprite(ringTex);
+    centerOrigin(highScoreMenu);
+    centerOrigin(bigRing);
+    centerOrigin(bigRing2);
+    centerOrigin(bigRing3);
+    centerOrigin(bigRing4);
+    centerOrigin(bigRing5);
 
     centerOrigin(ring1);
     centerOrigin(ring2);
@@ -67,8 +100,6 @@ Menu::Menu()
     centerOrigin(mediumMenu);
     centerOrigin(hardMenu);
 
-
-    
     logo->setScale({ 0.70f, 0.70f });
     play->setScale({ 0.70f, 0.70f });
     star->setScale({ 0.40f, 0.40f });
@@ -84,6 +115,12 @@ Menu::Menu()
     hardMenu->setScale({ 0.60f, 0.60f });
     ring1->setScale({ 0.15f, 0.15f });
     ring2->setScale({ 0.15f, 0.15f });
+    highScoreMenu->setScale({ 0.6f, 0.6f });
+    bigRing->setScale({ 0.98f, 0.98f }); 
+    bigRing2->setScale({ 0.7f, 0.7f }); 
+    bigRing3->setScale({ 0.7f, 0.7f }); 
+    bigRing4->setScale({ 0.7f, 0.7f }); 
+    bigRing5->setScale({ 0.7f, 0.7f });
 
     logo->setPosition({ 400.f, 150.f });
     play->setPosition({ 400.f, 450.f });
@@ -96,6 +133,38 @@ Menu::Menu()
     easyMenu->setPosition({ 400.f, 400.f });
     mediumMenu->setPosition({ 390.f, 580.f });
     hardMenu->setPosition({ 400.f, 760.f });
+    highScoreMenu->setPosition({ 400.f, 190.f });
+    bigRing->setPosition({ 400.f, 575.f });   
+    bigRing2->setPosition({ -50.0f, 457.f });
+    bigRing3->setPosition({ 830.f, 429.f });
+    bigRing4->setPosition({ 60.f, 905.f });
+    bigRing5->setPosition({ 738.f, 880.f });
+}
+//filehandling
+void Menu::loadHighScore() 
+{
+    std::ifstream file("highscore.txt");
+
+    if (file.is_open())
+    {
+        file >> highScore;
+        file.close();
+    }
+    else
+    {
+        highScore = 0; // first time run
+    }
+}
+
+void Menu::saveHighScore()
+{
+    std::ofstream file("highscore.txt");
+
+    if (file.is_open())
+    {
+        file << highScore;
+        file.close();
+    }
 }
 
 Menu::~Menu()
@@ -115,10 +184,19 @@ Menu::~Menu()
     delete hardMenu;
     delete ring1;
     delete ring2;
+    delete highScoreMenu;
+    delete bigRing;
+    delete bigRing2;
+    delete bigRing3;
+    delete bigRing4;
+    delete bigRing5;
+    delete scoreText;
+    delete highScoreText;
     cleanupGame();
 }
 void Menu::startGame()
 {
+    score = 0;
     cleanupGame();
 
     const int width = 800;
@@ -131,7 +209,7 @@ void Menu::startGame()
     gravity = 0.5f;
     jumpStrength = -10.f;
 
-    gameBall = new Ball(20.f, centerX, groundY);
+    gameBall = new Ball(10.f, centerX, groundY);
     gameCamera = new Camera((float)width, (float)height);
     shapeCapacity = 10;
     shapeCount = 0;
@@ -192,8 +270,19 @@ void Menu::handleEvent(const sf::Event& event)
                 wantsClose = true;
         }
         if (key->scancode == sf::Keyboard::Scancode::Space)
-            if (currentScreen == Screen::GameScreen && gameBall)
-                gameBall->setVelocityY(jumpStrength);
+        {
+            if (!spacePressed)
+            {
+                spacePressed = true;
+                if (currentScreen == Screen::GameScreen && gameBall)
+                    gameBall->setVelocityY(jumpStrength);
+            }
+        }
+    }
+    if (auto* key = event.getIf<sf::Event::KeyReleased>())
+    {
+        if (key->scancode == sf::Keyboard::Scancode::Space)
+            spacePressed = false;
     }
 
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>())
@@ -237,6 +326,12 @@ void Menu::update(float dt, float t)
 
     ring1->setRotation(sf::degrees(t * easySpeed));    
     ring2->setRotation(sf::degrees(-(t * easySpeed)));
+
+    bigRing->setRotation(sf::degrees(currentTime * 30.f)); 
+
+    scoreText->setString("Score: " + std::to_string(score));
+    highScoreText->setString(  std::to_string(highScore));
+    
     if (currentScreen == Screen::GameScreen && gameBall && gameCamera)
     {
         const int width = 800;
@@ -247,12 +342,46 @@ void Menu::update(float dt, float t)
         moveBall(*gameBall);
         resetBallOnGround(*gameBall, 880.f);
         updateCamera(*gameCamera, *gameBall, width, height);
+        rotateAllShapes(shapes, shapeCount, 1.0f);
+
+        if (checkStarCollection(*gameBall, shapes, shapeCount))
+        {
+            score++;
+
+            if (score > highScore)
+            {
+                highScore = score;
+                saveHighScore();
+            }
+
+            std::cout << "Score: " << score << "\n";
+        }
+
+        
+
+        checkShapePassCollision(*gameBall, shapes, shapeCount);
+
+        if (checkWrongColorCollision(*gameBall, shapes, shapeCount))
+        {
+            if (score > highScore)
+            {
+                highScore = score;
+                saveHighScore();
+            }
+            currentScreen = Screen::MainMenu;
+        }
 
         if (gameBall->getPosition().y < lastSpawnY + gap)
         {
             spawnShape(shapes, shapeCount, shapeCapacity,
                 width / 2.f, lastSpawnY, width);
             lastSpawnY -= gap;
+        }
+        while (shapeCount > 0 &&
+            shapes[0] != nullptr &&
+            shapes[0]->getY() > gameCamera->getCenter().y + 600.f)
+        {
+            removeFirst(shapes, shapeCount);
         }
     }
 }
@@ -312,16 +441,24 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::GameScreen)
     {
+        // 🎮 Game world (camera view)
         window.setView(gameCamera->getView());
 
         for (int i = 0; i < shapeCount; i++)
+        {
+            if (!shapes[i] || shapes[i]->isCollected())
+                continue;
             shapes[i]->draw(window);
+        }
 
         gameBall->draw(window);
 
-        // reset view back to default so menu elements aren't affected
+        // 🧾 UI (fixed screen view)
         window.setView(window.getDefaultView());
+
+        window.draw(*scoreText);   // ✅ ADD HERE
     }
+   
     else if (currentScreen == Screen::CreatorsMenu)
     {
         window.draw(*creatorPage);
@@ -336,7 +473,18 @@ void Menu::draw(sf::RenderWindow& window)
     }
     else if (currentScreen == Screen::HighscoreMenu)
     {
-        // score table
+        window.draw(*highScoreMenu);
+        plus->setPosition({ 160.f, 120.f });
+        plus2->setPosition({ 640.f, 120.f });
+        window.draw(*plus);
+        window.draw(*plus2);
+        window.draw(*bigRing);
+        window.draw(*bigRing2);
+        window.draw(*bigRing3);
+        window.draw(*bigRing4);
+        window.draw(*bigRing5);
+
+        window.draw(*highScoreText);
     }
     else if (currentScreen == Screen::AboutMenu)
     {
