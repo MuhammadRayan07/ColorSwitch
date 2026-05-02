@@ -15,6 +15,7 @@
 #include "Rotation.h"
 #include "Collision.h"
 #include"difficulty.h"
+#include <SFML/Audio.hpp>
 enum class Screen
 {
     MainMenu,
@@ -100,9 +101,17 @@ private:
     AnimatedBall leftBall2;
     AnimatedBall rightBall2;
 
+    sf::Music homeMusic;
+    sf::Music gameOverMusic;
+
+    sf::SoundBuffer bounceBuffer;
+    sf::SoundBuffer buttonBuffer;
+    sf::Sound *      bounceSound;
+    sf::Sound *     buttonSound;
+
     Screen currentScreen;
     bool   wantsClose;
-
+    bool gameOverMusicPlayed = false;
     void centerOrigin(sf::Sprite* s);
     bool clicked(sf::Sprite* s, sf::Vector2f mouse);
     void startGame(Difficulty diff);

@@ -49,6 +49,24 @@ Menu::Menu()
         std::cout << "Font not loaded\n";
     }
 
+    if (!homeMusic.openFromFile("ColorSwitchSprites/HomeMusic.ogg"))
+        std::cout << "HomeMusic not loaded\n";
+
+    if (!gameOverMusic.openFromFile("ColorSwitchSprites/GameOverMusic.ogg"))
+        std::cout << "GameOverMusic not loaded\n";
+
+    // Sound buffers
+    if (!bounceBuffer.loadFromFile("ColorSwitchSprites/Bounce.ogg"))
+        std::cout << "Bounce not loaded\n";
+
+    if (!buttonBuffer.loadFromFile("ColorSwitchSprites/Button.ogg"))
+        std::cout << "Button not loaded\n";
+
+    bounceSound = new sf::Sound(bounceBuffer);
+    buttonSound = new sf::Sound(buttonBuffer);
+    homeMusic.setLooping(true);
+    homeMusic.play();
+
     scoreText = new sf::Text(font);
     highScoreText = new sf::Text(font);
 
@@ -157,6 +175,9 @@ Menu::Menu()
     gameOver->setPosition({ 400.f, 450.f });
     homeBtn->setPosition({ 483.f, 520.f });
     continueBtn->setPosition({ 320.f, 520.f });
+
+    homeMusic.setVolume(30.f);
+    buttonSound->setVolume(50.f);
 }
 //filehandling
 void Menu::loadHighScore() 
@@ -213,10 +234,13 @@ Menu::~Menu()
     delete gameOver;
     delete homeBtn;
     delete continueBtn;
+    delete bounceSound;
+    delete buttonSound;
     cleanupGame();
 }
 void Menu::startGame(Difficulty diff)
 {
+    gameOverMusicPlayed = false;
     isGameOver = false;
     ballHasLaunched = false;
     score = 0;
@@ -308,7 +332,8 @@ void Menu::handleEvent(const sf::Event& event)
         {
             if (currentScreen != Screen::MainMenu)
             {
-                isGameOver = false;  
+                buttonSound->play();
+                isGameOver = false;
                 currentScreen = Screen::MainMenu;
             }
             else
@@ -320,7 +345,10 @@ void Menu::handleEvent(const sf::Event& event)
             {
                 spacePressed = true;
                 if (currentScreen == Screen::GameScreen && gameBall)
+                {
                     gameBall->setVelocityY(jumpStrength);
+                    bounceSound->play();  
+                }
             }
         }
     }
@@ -341,26 +369,59 @@ void Menu::handleEvent(const sf::Event& event)
 
             if (currentScreen == Screen::MainMenu)
             {
-                if (clicked(play, mousePos)) currentScreen = Screen::PlayMenu;
-                else if (clicked(creators, mousePos)) currentScreen = Screen::CreatorsMenu;
-                else if (clicked(high, mousePos)) currentScreen = Screen::HighscoreMenu;
-                else if (clicked(about, mousePos)) currentScreen = Screen::AboutMenu;
+                if (clicked(play, mousePos))
+                {
+                    buttonSound->play();
+                    currentScreen = Screen::PlayMenu;
+                }
+                else if (clicked(creators, mousePos))
+                {
+                    buttonSound->play();
+                    currentScreen = Screen::CreatorsMenu;
+                }
+                else if (clicked(high, mousePos))
+                {
+                    buttonSound->play();
+                    currentScreen = Screen::HighscoreMenu;
+                }
+                else if (clicked(about, mousePos))
+                {
+                    buttonSound->play();
+                    currentScreen = Screen::AboutMenu;
+                }
             }
             else if (currentScreen == Screen::PlayMenu)
             {
-                if (clicked(easyMenu, mousePos)) { startGame(Difficulty::Easy);   currentScreen = Screen::GameScreen; }
-                else if (clicked(mediumMenu, mousePos)) { startGame(Difficulty::Medium); currentScreen = Screen::GameScreen; }
-                else if (clicked(hardMenu, mousePos)) { startGame(Difficulty::Hard);   currentScreen = Screen::GameScreen; }
+                if (clicked(easyMenu, mousePos))
+                {
+                    buttonSound->play();
+                    startGame(Difficulty::Easy);
+                    currentScreen = Screen::GameScreen;
+                }
+                else if (clicked(mediumMenu, mousePos))
+                {
+                    buttonSound->play();
+                    startGame(Difficulty::Medium);
+                    currentScreen = Screen::GameScreen;
+                }
+                else if (clicked(hardMenu, mousePos))
+                {
+                    buttonSound->play();
+                    startGame(Difficulty::Hard);
+                    currentScreen = Screen::GameScreen;
+                }
             }
             else if (currentScreen == Screen::GameScreen && isGameOver)
             {
                 if (clicked(homeBtn, mousePos))
                 {
+                    buttonSound->play();
                     isGameOver = false;
                     currentScreen = Screen::MainMenu;
                 }
                 else if (clicked(continueBtn, mousePos))
                 {
+                    buttonSound->play();
                     isGameOver = false;
                     startGame(currentDifficulty);
                     currentScreen = Screen::GameScreen;
@@ -372,6 +433,38 @@ void Menu::handleEvent(const sf::Event& event)
 
 void Menu::update(float dt, float t)
 {
+    // Music management
+    if (isGameOver)
+    {
+        if (homeMusic.getStatus() == sf::Music::Status::Playing)
+            homeMusic.stop();
+
+        if (!gameOverMusicPlayed)
+        {
+            gameOverMusic.setLooping(false);
+            gameOverMusic.play();
+            gameOverMusicPlayed = true;
+        }
+    }
+    else if (currentScreen == Screen::GameScreen)
+    {
+        if (homeMusic.getStatus() == sf::Music::Status::Playing)
+            homeMusic.stop();
+
+        if (gameOverMusic.getStatus() == sf::Music::Status::Playing)
+            gameOverMusic.stop();
+    }
+    else
+    {
+        if (gameOverMusic.getStatus() == sf::Music::Status::Playing)
+            gameOverMusic.stop();
+
+        if (homeMusic.getStatus() != sf::Music::Status::Playing)
+        {
+            homeMusic.setLooping(true);
+            homeMusic.play();
+        }
+    }
     currentTime = t;
     leftBall.update(dt);
     rightBall.update(dt);
