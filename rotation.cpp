@@ -1,4 +1,4 @@
-#include"Rotation.h"
+#include "Rotation.h"
 
 void rotateAllShapes(Shape** shapes, int count, float angle)
 {
@@ -6,7 +6,6 @@ void rotateAllShapes(Shape** shapes, int count, float angle)
     {
         if (!shapes[i] || shapes[i]->isCollected())
             continue;
-
         shapes[i]->rotateShape(angle);
     }
 }
