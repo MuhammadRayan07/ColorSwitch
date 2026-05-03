@@ -46,7 +46,7 @@ private:
     float currentTime = 0.f;
     bool isGameOver = false;
     bool ballHasLaunched = false;
-    bool gameStarted = false;        // add this
+    bool gameStarted = false;        
     bool gameOverMusicPlayed = false;
 
     // game members

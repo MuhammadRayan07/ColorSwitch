@@ -45,21 +45,16 @@ bool checkWrongColorCollision(Ball& ball, Shape** shapes, int shapeCount)
     {
         if (!shapes[i] || shapes[i]->isCollected() || !shapes[i]->isObstacle())
             continue;
-        if (!shapes[i] || shapes[i]->isCollected() ||
-            !shapes[i]->isObstacle() || shapes[i]->isPassed())
-            continue;
+
         if (shapes[i]->isBallTouching(ball.getPosition(), ball.getRadius()))
         {
-            sf::Color touchColor =
-                shapes[i]->getCurrentTouchColor(ball.getPosition());
-
+            sf::Color touchColor = shapes[i]->getCurrentTouchColor(ball.getPosition());
             if (!sameColor(ball.getColor(), touchColor))
             {
                 std::cout << "Wrong collision from shape index: " << i << "\n";
                 return true;
             }
         }
-
     }
     return false;
 }
