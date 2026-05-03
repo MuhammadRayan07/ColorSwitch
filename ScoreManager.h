@@ -46,7 +46,7 @@ public:
         }
         catch (const std::runtime_error&)
         {
-            // silently fail — non-critical
+            // silently fails 
         }
     }
 };

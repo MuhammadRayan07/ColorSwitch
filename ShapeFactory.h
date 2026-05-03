@@ -11,7 +11,6 @@
 class ShapeFactory
 {
 public:
-    // template function — satisfies requirement 4
     template<typename T>
     static T* createShape(float x, float y, float scale = 1.0f)
     {
