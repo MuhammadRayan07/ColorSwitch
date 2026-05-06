@@ -17,10 +17,7 @@ void checkShapePassCollision(Ball& ball, Shape** shapes, int shapeCount)
             continue;
 
         float ballY = ball.getPosition().y;
-        float passLine = shapes[i]->getY()
-            - shapes[i]->getHalfHeight()
-            - ball.getRadius()
-            - 15.f;
+        float passLine = shapes[i]->getY() - shapes[i]->getHalfHeight() - ball.getRadius()  - 15.f;
 
         if (!shapes[i]->isPassed() && ballY < passLine)
         {

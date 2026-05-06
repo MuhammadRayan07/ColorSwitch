@@ -20,9 +20,9 @@ CircleShapeObj::CircleShapeObj(float x, float y, float scale)
 
     for (int p = 0; p < 4; p++)
     {
-        for (int i = 0; i < SEGMENTS; i++)
+        for (int i = 0; i < div; i++)
         {
-            float angle = (p * 90.f) + (i * (90.f / SEGMENTS));
+            float angle = (p * 90.f) + (i * (90.f / div));
             float rad = angle * 3.14159265f / 180.f;
             float px = x + std::cos(rad) * radius;
             float py = y + std::sin(rad) * radius;
@@ -73,6 +73,6 @@ void CircleShapeObj::draw(sf::RenderWindow& window)
     states.transform.translate({ -centerX, -centerY });
 
     for (int p = 0; p < 4; p++)
-        for (int i = 0; i < SEGMENTS; i++)
+        for (int i = 0; i < div; i++)
             window.draw(parts[p][i], states);
 }

@@ -7,8 +7,8 @@
 class CircleShapeObj : public Shape
 {
 private:
-    static const int SEGMENTS = 40;
-    sf::RectangleShape parts[4][SEGMENTS];
+    static const int div = 40;
+    sf::RectangleShape parts[4][div];
     sf::Color sectionColors[4];
     float centerX, centerY;
     float currentRotation = 0.f;

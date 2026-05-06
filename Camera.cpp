@@ -1,7 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(float width, float height)
-    : view(sf::FloatRect({ 0.f, 0.f }, { width, height }))
+Camera::Camera(float width, float height) : view(sf::FloatRect({ 0.f, 0.f }, { width, height }))
 {
     cameraVelocity = 0.f;
     cameraFollowSpeed = 0.04f;

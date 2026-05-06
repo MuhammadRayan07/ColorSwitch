@@ -46,7 +46,7 @@ public:
         }
         catch (const std::runtime_error&)
         {
-            // silently fails 
+            // meow meow
         }
     }
 };

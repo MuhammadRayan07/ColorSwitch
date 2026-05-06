@@ -1,6 +1,5 @@
 #include "AnimatedBall.h"
-AnimatedBall::AnimatedBall()
-    : x(0.f), y(0.f), velocity(0.f)
+AnimatedBall::AnimatedBall() : x(0.f), y(0.f), velocity(0.f)
 {
     ball.setRadius(18.f);
     ball.setOrigin({ 18.f, 18.f });

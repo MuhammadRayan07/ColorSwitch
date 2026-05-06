@@ -1,9 +1,7 @@
 #include "Assets.h"
 #include <iostream>
 
-void AssetManager::loadTexture(
-    const std::string& name,
-    const std::string& filename)
+void AssetManager::loadTexture( const std::string& name,const std::string& filename)
 {
     sf::Texture tex;
     if (!tex.loadFromFile(filename))

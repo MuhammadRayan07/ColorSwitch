@@ -37,10 +37,6 @@ TriangleShapeObj::TriangleShapeObj(float x, float y,float scale)
     right.setRotation(sf::degrees(angle));
     right.setFillColor(rightColor);
 }
-
-
-
-
 bool TriangleShapeObj::isBallTouching(sf::Vector2f ballPos, float ballRadius) const
 {
     sf::Vector2f local = rotatePointBack(ballPos, centerX, centerY, currentRotation);
