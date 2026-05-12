@@ -42,7 +42,11 @@ Menu::Menu()
         !highScoreMenuTex.loadFromFile("ColorSwitchSprites/Hs.png") ||
         !gameOverTex.loadFromFile("ColorSwitchSprites/GameOver.png") ||
         !homeTex.loadFromFile("ColorSwitchSprites/Home.png") ||
-        !continueTex.loadFromFile("ColorSwitchSprites/Continue.png"))
+        !continueTex.loadFromFile("ColorSwitchSprites/Continue.png")||
+        !pauseMenuTex.loadFromFile("ColorSwitchSprites/pausemenu.png") ||
+        !resumeTex.loadFromFile("ColorSwitchSprites/resume.png") ||
+        !restartTex.loadFromFile("ColorSwitchSprites/restartswitch.png") ||
+        !homePauseTex.loadFromFile("ColorSwitchSprites/mainmenu.png"))
     {
         std::cout << "Failed loading textures\n";
     }
@@ -102,6 +106,10 @@ Menu::Menu()
     gameOver = new sf::Sprite(gameOverTex);
     homeBtn = new sf::Sprite(homeTex);
     continueBtn = new sf::Sprite(continueTex);
+    pauseMenu = new sf::Sprite(pauseMenuTex);
+    resumeBtn = new sf::Sprite(resumeTex);
+    restartBtn = new sf::Sprite(restartTex);
+    homePauseBtn = new sf::Sprite(homePauseTex);
 
     centerOrigin(highScoreMenu);
     centerOrigin(bigRing);
@@ -127,6 +135,10 @@ Menu::Menu()
     centerOrigin(easyMenu);
     centerOrigin(mediumMenu);
     centerOrigin(hardMenu);
+    centerOrigin(pauseMenu);
+    centerOrigin(resumeBtn);
+    centerOrigin(restartBtn);
+    centerOrigin(homePauseBtn);
 
     logo->setScale({ 0.70f, 0.70f });
     play->setScale({ 0.70f, 0.70f });
@@ -152,6 +164,10 @@ Menu::Menu()
     gameOver->setScale({ 0.50f, 0.50f });
     homeBtn->setScale({ 0.47f, 0.47f });
     continueBtn->setScale({ 0.47f, 0.47f });
+    pauseMenu->setScale({ 1.5f, 1.5f });
+    resumeBtn->setScale({ 0.60f, 0.60f });
+    restartBtn->setScale({ 0.60f, 0.60f });
+    homePauseBtn->setScale({ 0.60f, 0.60f });
 
     logo->setPosition({ 400.f, 150.f });
     play->setPosition({ 400.f, 450.f });
@@ -173,11 +189,16 @@ Menu::Menu()
     gameOver->setPosition({ 400.f, 450.f });
     homeBtn->setPosition({ 483.f, 520.f });
     continueBtn->setPosition({ 320.f, 520.f });
+    pauseMenu->setPosition({ 400.f, 450.f });
+    resumeBtn->setPosition({ 400.f, 395.f });
+    restartBtn->setPosition({ 400.f, 487.f });  
+    homePauseBtn->setPosition({ 399.f, 574.f });
+
 
     homeMusic.setVolume(30.f);
     buttonSound->setVolume(50.f);
 }
-
+//
 Menu::~Menu()
 {
     delete logo;
@@ -208,6 +229,10 @@ Menu::~Menu()
     delete continueBtn;
     delete bounceSound;
     delete buttonSound;
+    delete pauseMenu;
+    delete resumeBtn;
+    delete restartBtn;
+    delete homePauseBtn;
     cleanupGame();
 }
 
@@ -216,6 +241,7 @@ void Menu::startGame(Difficulty diff)
     gameOverMusicPlayed = false;
     isGameOver = false;
     ballHasLaunched = false;
+    isPaused = false;
     scoreManager.reset();
     scoreManager.load();
     cleanupGame();
@@ -329,8 +355,16 @@ void Menu::handleEvent(const sf::Event& event)
             else
                 wantsClose = true;
         }
+        if (key->scancode == sf::Keyboard::Scancode::P)
+        {
+            if (currentScreen == Screen::GameScreen && !isGameOver)
+            {
+                isPaused = !isPaused;
+            }
+        }
         if (key->scancode == sf::Keyboard::Scancode::Space)
         {
+            if (isPaused) return;
             if (!spacePressed)
             {
                 spacePressed = true;
@@ -417,6 +451,30 @@ void Menu::handleEvent(const sf::Event& event)
                     currentScreen = Screen::GameScreen;
                 }
             }
+            else if (currentScreen == Screen::GameScreen && isPaused && !isGameOver)
+            {
+                if (clicked(resumeBtn, mousePos))
+                {
+                    buttonSound->play();
+                    isPaused = false;
+                }
+                else if (clicked(restartBtn, mousePos))
+                {
+                    buttonSound->play();
+                    isPaused = false;
+                    startGame(currentDifficulty);
+                    currentScreen = Screen::GameScreen;
+                }
+                else if (clicked(homePauseBtn, mousePos))
+                {
+                    buttonSound->play();
+                    isPaused = false;
+                    isGameOver = false;
+                    gameStarted = false;
+                    cleanupGame();
+                    currentScreen = Screen::MainMenu;
+                }
+            }
         }
     }
 }
@@ -433,6 +491,16 @@ void Menu::update(float dt, float t)
             gameOverMusic.setLooping(false);
             gameOverMusic.play();
             gameOverMusicPlayed = true;
+        }
+    }
+    else if (isPaused)
+    {
+        if (gameOverMusic.getStatus() == sf::Music::Status::Playing)
+            gameOverMusic.stop();
+        if (homeMusic.getStatus() != sf::Music::Status::Playing)
+        {
+            homeMusic.setLooping(true);
+            homeMusic.play();
         }
     }
     else if (currentScreen == Screen::GameScreen)
@@ -469,7 +537,7 @@ void Menu::update(float dt, float t)
     scoreText->setString("Score: " + std::to_string(scoreManager.getScore()));
     highScoreText->setString(std::to_string(scoreManager.getHighScore()));
 
-    if (currentScreen == Screen::GameScreen && gameBall && gameCamera && !isGameOver)
+    if (currentScreen == Screen::GameScreen && gameBall && gameCamera && !isGameOver&&!isPaused)
     {
         const int   width = 800;
         const int   height = 900;
@@ -482,7 +550,7 @@ void Menu::update(float dt, float t)
         if (gameBall->getVelocityY() < 0.f)
             ballHasLaunched = true;
 
-        if (ballHasLaunched && gameBall->getPosition().y >= 880.f && !isGameOver)
+        if (ballHasLaunched && gameBall->getPosition().y >= 880.f && !isGameOver && !isPaused)
         {
             scoreManager.save();
             isGameOver = true;
@@ -597,6 +665,13 @@ void Menu::draw(sf::RenderWindow& window)
             window.draw(*gameOver);
             window.draw(*homeBtn);
             window.draw(*continueBtn);
+        }
+        if (isPaused)                         
+        {
+            window.draw(*pauseMenu);  
+            window.draw(*resumeBtn);         
+            window.draw(*restartBtn);
+            window.draw(*homePauseBtn);
         }
     }
     else if (currentScreen == Screen::CreatorsMenu)

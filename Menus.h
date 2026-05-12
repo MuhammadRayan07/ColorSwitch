@@ -48,6 +48,7 @@ private:
     bool ballHasLaunched = false;
     bool gameStarted = false;        
     bool gameOverMusicPlayed = false;
+    bool isPaused = false;
 
     // game members
     Ball* gameBall;
@@ -61,6 +62,7 @@ private:
     float      jumpStrength;
     Difficulty currentDifficulty;
 
+    sf::Texture pauseMenuTex, resumeTex, restartTex, homePauseTex;
     sf::Texture logoTex, playTex, starTex, plusTex;
     sf::Texture creatorsTex, highTex, aboutTex;
     sf::Texture creatorPageTex, detailsTex;
@@ -71,6 +73,7 @@ private:
     sf::Font    font;
     sf::Text* scoreText;
     sf::Text* highScoreText;
+
 
     sf::Sprite* ring1;
     sf::Sprite* ring2;
@@ -96,6 +99,10 @@ private:
     sf::Sprite* gameOver;
     sf::Sprite* homeBtn;
     sf::Sprite* continueBtn;
+    sf::Sprite* pauseMenu;
+    sf::Sprite* resumeBtn;
+    sf::Sprite* restartBtn;
+    sf::Sprite* homePauseBtn;
 
     AnimatedBall leftBall;
     AnimatedBall rightBall;
