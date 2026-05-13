@@ -49,6 +49,7 @@ private:
     bool gameStarted = false;        
     bool gameOverMusicPlayed = false;
     bool isPaused = false;
+    bool hintVisible = true;
 
     // game members
     Ball* gameBall;
@@ -73,6 +74,8 @@ private:
     sf::Font    font;
     sf::Text* scoreText;
     sf::Text* highScoreText;
+    sf::Text* hintText;
+
 
 
     sf::Sprite* ring1;

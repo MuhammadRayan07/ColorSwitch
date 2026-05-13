@@ -73,6 +73,13 @@ Menu::Menu()
 
     scoreText = new sf::Text(font);
     highScoreText = new sf::Text(font);
+    hintText = new sf::Text(font);
+    hintText->setCharacterSize(30);
+
+    hintText->setFillColor(sf::Color::White);
+    hintText->setString("Press Space to start | P to pause");
+    hintText->setOrigin({ hintText->getLocalBounds().size.x / 2.f, hintText->getLocalBounds().size.y / 2.f });
+    hintText->setPosition({ 400.f, 820.f });
 
     scoreText->setCharacterSize(30);
     scoreText->setFillColor(sf::Color::White);
@@ -233,11 +240,13 @@ Menu::~Menu()
     delete resumeBtn;
     delete restartBtn;
     delete homePauseBtn;
+    delete hintText;
     cleanupGame();
 }
 
 void Menu::startGame(Difficulty diff)
 {
+    hintVisible = true;
     gameOverMusicPlayed = false;
     isGameOver = false;
     ballHasLaunched = false;
@@ -357,13 +366,16 @@ void Menu::handleEvent(const sf::Event& event)
         }
         if (key->scancode == sf::Keyboard::Scancode::P)
         {
+
             if (currentScreen == Screen::GameScreen && !isGameOver)
             {
+                hintVisible = false;
                 isPaused = !isPaused;
             }
         }
         if (key->scancode == sf::Keyboard::Scancode::Space)
         {
+            hintVisible = false;
             if (isPaused) return;
             if (!spacePressed)
             {
@@ -659,7 +671,19 @@ void Menu::draw(sf::RenderWindow& window)
         gameBall->draw(window);
         window.setView(window.getDefaultView());
         window.draw(*scoreText);
+        if (hintVisible && gameBall && gameCamera)
+        {
+            sf::Vector2f ballPos = gameBall->getPosition();
+            sf::Vector2f camCenter = gameCamera->getCenter();
 
+            float screenX = 400.f;
+            float screenY = 450.f + (ballPos.y - camCenter.y) - 120.f;
+
+            hintText->setOrigin({ hintText->getLocalBounds().size.x / 2.f,
+                                  hintText->getLocalBounds().size.y / 2.f });
+            hintText->setPosition({ screenX, screenY });
+            window.draw(*hintText);
+        }
         if (isGameOver)
         {
             window.draw(*gameOver);

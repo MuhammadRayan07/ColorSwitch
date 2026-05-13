@@ -50,4 +50,4 @@ public:
     void  markPassed() { passed = true; }
 
     virtual ~Shape() {}
-};
+};  
